@@ -4,8 +4,8 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.0.0
-- **Status:** Implemented
+- **Spec version:** 1.0.1
+- **Status:** Implemented (placeholder mode — see §11)
 - **Last updated:** 2026-06-09
 
 ---
@@ -74,9 +74,9 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 
 ## 9. Open items / backlog
 
-- [ ] Replace 6 placeholder Bandcamp album IDs with real ones.
+- [ ] Replace 6 placeholder Bandcamp album IDs with real ones. _(deferred — intentional placeholders; site runs in placeholder mode, see §11.)_
 - [ ] Replace placeholder cover art in `assets/covers/`.
-- [ ] Set real Formspree/Mailchimp form action.
+- [ ] Set real Formspree/Mailchimp form action. _(deferred — `action` left as `YOUR_FORM_ID`; form shows a friendly confirmation until wired.)_
 - [ ] Replace placeholder Bandcamp/social URLs in footers.
 - [ ] Connect GitHub remote for the sync bus (see `.sync/BUS.md`).
 
@@ -85,3 +85,15 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 1. Edit this SPEC first (bump version, note the change under §9 or a changelog).
 2. Implement to match.
 3. Update `.sync/state.json`, then commit spec + code + state together.
+
+---
+
+## 11. Decision log
+
+- **2026-06-09 — Defer real Bandcamp IDs + Formspree wiring.** The site ships in
+  *placeholder mode*: Bandcamp embeds use placeholder `albumId`s (flagged
+  `REPLACE WITH REAL…`) and the subscribe form keeps `action=…/YOUR_FORM_ID`,
+  which makes `script.js` show a friendly confirmation instead of posting.
+  Placeholder release titles/artists are kept. These placeholders are
+  **intentional, not bugs.** To go live: supply the values, wire them in, and
+  bump the spec to `1.1.0`.
