@@ -354,6 +354,19 @@ h1, h2, h3, h4 {
 
 .hero__logotype .accent { color: var(--text-dim); }
 
+/* Hero brand logo (the real Sontra Records mark). mix-blend-mode: screen drops
+   the JPEG's black background against the dark hero. Swap the file in assets/. */
+.hero__logo {
+  margin: 0 0 6px;
+  line-height: 0;            /* kill the inline-image baseline gap */
+}
+.hero__logo img {
+  width: clamp(220px, 36vw, 360px);
+  height: auto;
+  display: block;
+  mix-blend-mode: screen;
+}
+
 .hero__tagline {
   margin-top: 22px;
   max-width: 620px;
