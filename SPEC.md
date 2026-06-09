@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.4.0
+- **Spec version:** 1.4.1
 - **Status:** Implemented (self-hosted audio player; silent demo until enabled — see §11)
 - **Last updated:** 2026-06-09
 
@@ -145,7 +145,14 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   explicit `audio:` path). With it off, the player stays a silent demo. Player
   meta now shows the track title/artist (was "coming soon / bandcamp"); each
   release's waveform is rotated by a catalog seed so they look different. Bandcamp
-  embeds remain optional via `BANDCAMP_ENABLED`. Shown via CSS
+  embeds remain optional via `BANDCAMP_ENABLED`.
+- **2026-06-09 — Newest release = real release (Blue Friday).** Replaced the
+  placeholder newest release: `RELEASES[0]` → catalog `STR001`, "Blue Friday" by
+  "Sontra Crew", cover `assets/covers/str001-blue-friday.jpg` (user-supplied;
+  portrait, cropped square in cards). Genre/year are best-guess placeholders
+  pending confirmation. Audio (when enabled) resolves to `assets/audio/str001.mp3`.
+  Buy/Donate still point to placeholder Bandcamp URLs — revisit since the site is
+  now no-Bandcamp. Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in

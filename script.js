@@ -33,12 +33,12 @@
 
 const RELEASES = [
   {
-    catalog: "SR-012",
-    title:   "Nocturne Transmissions",
-    artist:  "Vesper Lane",
-    year:    2026,
-    genre:   "Ambient",
-    cover:   "assets/covers/cover-01.svg",
+    catalog: "STR001",
+    title:   "Blue Friday",
+    artist:  "Sontra Crew",
+    year:    2026,                /* TODO: confirm real release year */
+    genre:   "Electronic",       /* TODO: confirm real genre */
+    cover:   "assets/covers/str001-blue-friday.jpg",
     albumId: "123456789", /* <!-- REPLACE WITH REAL BANDCAMP ALBUM ID --> */
     buyUrl:    "https://sontrarecords.bandcamp.com/album/nocturne-transmissions",
     donateUrl: "https://sontrarecords.bandcamp.com/album/nocturne-transmissions"
