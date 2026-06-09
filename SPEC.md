@@ -4,8 +4,8 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.3.0
-- **Status:** Implemented (interface-first; interactive player demo — see §11)
+- **Spec version:** 1.4.0
+- **Status:** Implemented (self-hosted audio player; silent demo until enabled — see §11)
 - **Last updated:** 2026-06-09
 
 ---
@@ -53,14 +53,16 @@ cover (path), albumId (Bandcamp), buyUrl, donateUrl
 
 ## 6. Integrations
 
-- **Bandcamp:** *interface-first.* Each release card renders a styled **player
-  placeholder** until the `sontra-bandcamp` account + real album IDs are ready.
-  The placeholder is **interactive** — pressing play expands a full-width waveform
-  scrubber you can click to seek (a UI demo; no audio until enabled).
-  A single flag in `script.js` — `BANDCAMP_ENABLED` (default `false`) — swaps
-  every placeholder for the real embed (`bandcampSrc(albumId)`, styled
-  `bgcol=111111 / linkcol=ffffff`). Placeholder IDs flagged
-  `REPLACE WITH REAL BANDCAMP ALBUM ID`.
+- **Player (self-hosted audio — no Bandcamp needed).** Each release uses the
+  site's own player: an interactive **waveform scrubber** (press play → the
+  waveform drops to full width; click / arrow-keys to seek). Power it by hosting
+  your own audio — set `AUDIO_ENABLED = true` in `script.js` and drop each track
+  in `assets/audio/` named `<catalog>.mp3` (e.g. `sr-012.mp3`), or set an explicit
+  `audio:` path per release (any browser format: mp3/m4a/ogg/wav). With audio off
+  it runs as a silent visual demo. `customPlayer()` builds it; `setupPlayer()`
+  wires playback. *Optional:* Bandcamp embeds remain available via
+  `BANDCAMP_ENABLED` + a real `albumId` (`bandcampSrc`, styled
+  `bgcol=111111 / linkcol=ffffff`).
 - **Email:** `<form class="subscribe__form">` posts to a provider. Placeholder
   `action="https://formspree.io/f/YOUR_FORM_ID"`; until a real action is set,
   JS shows a friendly confirmation. AJAX submit when a real action is present.
@@ -79,7 +81,7 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 
 ## 9. Open items / backlog
 
-- [ ] Add real Bandcamp album IDs + set `BANDCAMP_ENABLED = true` to enable players. _(deferred until sontra-bandcamp credentials ready; cards show a player placeholder meanwhile — see §11.)_
+- [ ] Add audio to `assets/audio/` (named `<catalog>.mp3`) + set `AUDIO_ENABLED = true` for real playback. _(self-hosted, no Bandcamp; silent demo until then — see §11. Bandcamp embeds remain an optional alternative.)_
 - [ ] Replace placeholder cover art in `assets/covers/`.
 - [ ] Set real Formspree/Mailchimp form action. _(deferred — `action` left as `YOUR_FORM_ID`; form shows a friendly confirmation until wired.)_
 - [ ] Replace placeholder Bandcamp/social URLs in footers.
@@ -101,7 +103,8 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   which makes `script.js` show a friendly confirmation instead of posting.
   Placeholder release titles/artists are kept. These placeholders are
   **intentional, not bugs.** To go live: supply the values, wire them in, and
-  bump the spec to `1.4.0`.
+  bump the spec accordingly. _(Note: the Formspree form still applies; Bandcamp
+  is now optional — the site ships with its own self-hosted audio player, §11.)_
 - **2026-06-09 — Interface-first: Bandcamp player placeholder.** Release cards
   render a styled disabled-player placeholder ("Player coming soon · streaming
   via sontra-bandcamp") instead of a live embed with fake IDs. Controlled by
@@ -134,7 +137,15 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   waveform scrubber** (click / arrow-keys to seek), with mock progress + a running
   time; only one plays at a time. Homepage grids now render `slice(1,4)` /
   `slice(4)` so the featured release isn't duplicated. The logo remains in the
-  navbar + favicon. Shown via CSS
+  navbar + favicon.
+- **2026-06-09 — Self-hosted audio player (no Bandcamp).** The custom waveform
+  player now plays a real `<audio>` element when `AUDIO_ENABLED = true`: progress
+  and seek are driven by the audio's `currentTime`/`duration`; one track plays at
+  a time. Audio resolves from `assets/audio/<catalog>.mp3` (or a release's
+  explicit `audio:` path). With it off, the player stays a silent demo. Player
+  meta now shows the track title/artist (was "coming soon / bandcamp"); each
+  release's waveform is rotated by a catalog seed so they look different. Bandcamp
+  embeds remain optional via `BANDCAMP_ENABLED`. Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in

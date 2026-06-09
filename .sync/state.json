@@ -1,7 +1,7 @@
 {
   "$schema_version": 1,
   "comment": "Sync-bus heartbeat. Each node updates its entry on every push. See .sync/BUS.md.",
-  "spec_version": "1.3.0",
+  "spec_version": "1.4.0",
   "github": {
     "connected": true,
     "url": "https://github.com/forfuturegoods-lang/sontra-records.git",
@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-09",
-      "focus": "Hero features newest release; placeholder player is interactive (play → full-width waveform scrubber to seek).",
-      "spec_version": "1.3.0"
+      "focus": "Self-hosted audio: waveform player plays real <audio> when AUDIO_ENABLED (assets/audio/<catalog>.mp3); Bandcamp now optional.",
+      "spec_version": "1.4.0"
     },
     "claude-remote": {
       "last_sync": null,

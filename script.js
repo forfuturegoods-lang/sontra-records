@@ -105,14 +105,28 @@ const RELEASES = [
    These match the dark theme. Change once, applies to every embed.
    bg = 111111 (player background), link = ffffff (link/accent color).
    ────────────────────────────────────────────────────────────────────────── */
-/* INTERFACE-FIRST TOGGLE.
-   Until the `sontra-bandcamp` credentials + real album IDs are ready, each
-   release shows a styled PLACEHOLDER where the player will go — so the layout
-   looks finished instead of loading a broken embed with fake IDs.
+/* ─────────────────────────────────────────────────────────────────────────
+   PLAYER MODE — pick how the players get their audio. NO Bandcamp required.
 
-   ► TO ENABLE REAL PLAYERS LATER: set this to true (after putting real album
-     IDs into the RELEASES array). Nothing else needs to change. */
-const BANDCAMP_ENABLED = false;
+   1) SELF-HOSTED AUDIO (recommended — uses this site's own waveform player):
+        • Drop each track in  assets/audio/  named  <catalog>.mp3
+          e.g.  assets/audio/sr-012.mp3   (lower-case catalog number)
+          — or set an explicit `audio:` path on a release in RELEASES to override.
+          Any browser-playable format works: .mp3 .m4a .ogg .wav
+        • Then set  AUDIO_ENABLED = true  below.
+
+   2) BANDCAMP EMBED (optional alternative): set BANDCAMP_ENABLED = true and give
+      each release a real `albumId`.
+
+   With both false, the custom player runs as a silent visual demo. */
+const AUDIO_ENABLED    = false;   // ← flip to true once your audio files are in
+const BANDCAMP_ENABLED = false;   // ← optional: use Bandcamp embeds instead
+
+/* Resolve a release's audio file: explicit `audio:` path, else the convention
+   assets/audio/<catalog>.mp3 (catalog lower-cased). */
+function audioUrlFor(r) {
+  return r.audio || ("assets/audio/" + String(r.catalog).toLowerCase() + ".mp3");
+}
 
 /* Player look (used once enabled). bg = player background, link = accent. */
 const BANDCAMP_BG   = "111111";
@@ -142,44 +156,51 @@ function bandcampEmbed(r) {
       </div>`;
 }
 
-/* Interactive placeholder player. Paused = compact bar; pressing play expands
-   the waveform into a full-width scrubber you can click to seek (fast-forward).
-   It's a UI demo until BANDCAMP_ENABLED swaps in the real Bandcamp embed.
-   initPlayers() wires up the behavior. */
-function bandcampPlaceholder(r) {
-  // static (non-random) bar heights — full scrubber + small paused indicator
-  const big  = [8,14,10,18,12,22,16,24,14,20,12,26,18,14,22,16,12,20,10,16,
+/* The site's own player: a compact bar that, on play, drops a full-width
+   waveform scrubber (click / arrow-keys to seek). Plays a real <audio> file
+   when AUDIO_ENABLED; otherwise runs as a silent visual demo. setupPlayer()
+   wires up the behavior. */
+function customPlayer(r) {
+  // base waveform heights, rotated per release so each track looks different
+  const base = [8,14,10,18,12,22,16,24,14,20,12,26,18,14,22,16,12,20,10,16,
                 24,14,18,12,20,16,22,12,18,10,14,20,16,24,12,18,14,22,16,12];
-  const mini = [8,16,11,22,14,26,12,20,9,24,15,18,10,21,13,19];
-  const bigBars  = big.map(h => `<span style="--h:${h}px"></span>`).join("");
-  const miniBars = mini.map(h => `<span style="--h:${h}px"></span>`).join("");
+  const seed = String(r.catalog).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  const big  = base.map((_, i) => base[(i + seed) % base.length]);
+  const mini = big.slice(0, 16);
+  const bars = arr => arr.map(h => `<span style="--h:${h}px"></span>`).join("");
+
+  // Real audio element — only rendered when self-hosted audio is enabled.
+  const audioEl = AUDIO_ENABLED
+    ? `<audio preload="metadata" src="${esc(audioUrlFor(r))}"></audio>` : "";
+
   return `
-      <div class="player" data-player aria-label="Preview player for ${esc(r.title)}">
+      <div class="player" data-player aria-label="Player for ${esc(r.title)} by ${esc(r.artist)}">
+        ${audioEl}
         <div class="player__bar">
-          <button class="player__btn" type="button" data-play aria-label="Play / pause preview">
+          <button class="player__btn" type="button" data-play aria-label="Play / pause">
             <span class="player__icon-play" aria-hidden="true">▶</span>
             <span class="player__icon-pause" aria-hidden="true">❚❚</span>
           </button>
           <span class="player__meta">
-            <span class="player__title">Player coming soon</span>
-            <span class="player__sub">Streaming via sontra-bandcamp</span>
+            <span class="player__title">${esc(r.title)}</span>
+            <span class="player__sub">${esc(r.artist)}</span>
           </span>
-          <span class="player__mini" aria-hidden="true">${miniBars}</span>
+          <span class="player__mini" aria-hidden="true">${bars(mini)}</span>
           <span class="player__time" data-time>0:00</span>
         </div>
         <div class="player__scrub" data-scrub role="slider" tabindex="0"
              aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <div class="player__wave">
-            <div class="player__bars" aria-hidden="true">${bigBars}</div>
-            <div class="player__bars player__bars--fg" data-fg aria-hidden="true">${bigBars}</div>
+            <div class="player__bars" aria-hidden="true">${bars(big)}</div>
+            <div class="player__bars player__bars--fg" data-fg aria-hidden="true">${bars(big)}</div>
           </div>
         </div>
       </div>`;
 }
 
-/* Choose embed vs placeholder based on the flag. */
+/* Choose the optional Bandcamp embed vs the site's own audio player. */
 function bandcampPlayer(r) {
-  return BANDCAMP_ENABLED ? bandcampEmbed(r) : bandcampPlaceholder(r);
+  return BANDCAMP_ENABLED ? bandcampEmbed(r) : customPlayer(r);
 }
 
 /* Small helper: escape text so titles/artists can safely contain &, <, > etc. */
@@ -400,10 +421,11 @@ function setupPlayer(player) {
   const scrub  = player.querySelector("[data-scrub]");
   const fg     = player.querySelector("[data-fg]");
   const timeEl = player.querySelector("[data-time]");
+  const audio  = player.querySelector("audio");   // present only when AUDIO_ENABLED
   if (!btn || !scrub || !fg) return;
 
-  const DURATION = 32;        // mock preview length, seconds
-  let pct = 0;                // 0..100 played
+  const DEMO_DURATION = 32;        // seconds, used only for the silent demo
+  let pct = 0;                     // 0..100 played
   let playing = false;
   let raf = null, last = 0;
 
@@ -411,46 +433,65 @@ function setupPlayer(player) {
     const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
     return m + ":" + String(s).padStart(2, "0");
   };
+  // total seconds: real audio duration when known, else the demo length
+  const total = () =>
+    (audio && audio.duration && isFinite(audio.duration)) ? audio.duration : DEMO_DURATION;
+
   function render() {
     fg.style.clipPath = "inset(0 " + (100 - pct) + "% 0 0)";   // reveal played bars
     scrub.setAttribute("aria-valuenow", Math.round(pct));
-    if (timeEl) timeEl.textContent = fmt(DURATION * pct / 100);
+    if (timeEl) timeEl.textContent = fmt(total() * pct / 100);
   }
   function stop() {
     playing = false;
     player.classList.remove("is-playing");
+    if (audio) audio.pause();
     if (raf) cancelAnimationFrame(raf);
     raf = null; last = 0;
     if (_activePlayer === api) _activePlayer = null;
   }
-  function tick(now) {
-    if (!last) last = now;
-    pct += ((now - last) / 1000 / DURATION) * 100;
-    last = now;
-    if (pct >= 100) { pct = 100; render(); stop(); pct = 0; return; }
+  // per-frame progress: from the audio element if real, else a timed ramp
+  function frame(now) {
+    if (audio) {
+      if (audio.duration) pct = (audio.currentTime / audio.duration) * 100;
+    } else {
+      if (!last) last = now;
+      pct += ((now - last) / 1000 / DEMO_DURATION) * 100;
+      last = now;
+      if (pct >= 100) { pct = 100; render(); stop(); pct = 0; return; }
+    }
     render();
-    raf = requestAnimationFrame(tick);
+    raf = requestAnimationFrame(frame);
   }
   function play() {
     if (_activePlayer && _activePlayer !== api) _activePlayer.stop();  // one at a time
     playing = true; last = 0;
     _activePlayer = api;
     player.classList.add("is-playing");
-    raf = requestAnimationFrame(tick);
+    if (audio) audio.play().catch(() => {});      // user-gesture, so allowed
+    raf = requestAnimationFrame(frame);
   }
   const api = { stop };
 
+  if (audio) {
+    audio.addEventListener("ended", () => { stop(); pct = 0; render(); });
+    audio.addEventListener("loadedmetadata", render);   // refresh the time once known
+  }
+
   btn.addEventListener("click", () => { playing ? stop() : play(); });
 
-  const seek = clientX => {
-    const r = scrub.getBoundingClientRect();
-    pct = Math.max(0, Math.min(100, ((clientX - r.left) / r.width) * 100));
+  function seekTo(p) {
+    pct = Math.max(0, Math.min(100, p));
+    if (audio && audio.duration) audio.currentTime = (pct / 100) * audio.duration;
     render();
-  };
-  scrub.addEventListener("click", e => seek(e.clientX));
+  }
+  scrub.addEventListener("click", e => {
+    const r = scrub.getBoundingClientRect();
+    seekTo(((e.clientX - r.left) / r.width) * 100);
+  });
   scrub.addEventListener("keydown", e => {
-    if (e.key === "ArrowRight")     { pct = Math.min(100, pct + 5); render(); e.preventDefault(); }
-    else if (e.key === "ArrowLeft") { pct = Math.max(0,   pct - 5); render(); e.preventDefault(); }
+    if (e.key === "ArrowRight")     { seekTo(pct + 5); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { seekTo(pct - 5); e.preventDefault(); }
   });
 
   render();
