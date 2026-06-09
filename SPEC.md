@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.4.1
+- **Spec version:** 1.4.2
 - **Status:** Implemented (self-hosted audio player; silent demo until enabled — see §11)
 - **Last updated:** 2026-06-09
 
@@ -149,8 +149,8 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 - **2026-06-09 — Newest release = real release (Blue Friday).** Replaced the
   placeholder newest release: `RELEASES[0]` → catalog `STR001`, "Blue Friday" by
   "Sontra Crew", cover `assets/covers/str001-blue-friday.jpg` (user-supplied;
-  portrait, cropped square in cards). Genre/year are best-guess placeholders
-  pending confirmation. Audio (when enabled) resolves to `assets/audio/str001.mp3`.
+  portrait, cropped square in cards). Genre = House, year = 2026 (confirmed by
+  label). Audio (when enabled) resolves to `assets/audio/str001.mp3`.
   Buy/Donate still point to placeholder Bandcamp URLs — revisit since the site is
   now no-Bandcamp. Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
