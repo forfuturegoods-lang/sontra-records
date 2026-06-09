@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.0.1
+- **Spec version:** 1.0.2
 - **Status:** Implemented (placeholder mode — see §11)
 - **Last updated:** 2026-06-09
 
@@ -78,7 +78,7 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 - [ ] Replace placeholder cover art in `assets/covers/`.
 - [ ] Set real Formspree/Mailchimp form action. _(deferred — `action` left as `YOUR_FORM_ID`; form shows a friendly confirmation until wired.)_
 - [ ] Replace placeholder Bandcamp/social URLs in footers.
-- [ ] Connect GitHub remote for the sync bus (see `.sync/BUS.md`).
+- [x] Connect GitHub remote for the sync bus — `origin` = forfuturegoods-lang/sontra-records (see `.sync/BUS.md`).
 
 ## 10. Change protocol
 
@@ -97,3 +97,8 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   Placeholder release titles/artists are kept. These placeholders are
   **intentional, not bugs.** To go live: supply the values, wire them in, and
   bump the spec to `1.1.0`.
+- **2026-06-09 — GitHub remote connected; bus online.** `origin` →
+  `https://github.com/forfuturegoods-lang/sontra-records.git`, `main` pushed.
+  `claude-remote` can now join by opening this repo. Note: commits so far are
+  authored `pansan4o@gmail.com`; repo owner is a different GitHub identity
+  (`forfuturegoods-lang`) — attribution fix pending if desired.
