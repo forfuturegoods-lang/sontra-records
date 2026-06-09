@@ -39,6 +39,7 @@ const RELEASES = [
     year:    2026,
     genre:   "House",
     cover:   "assets/covers/str001-blue-friday.jpg",
+    bpm:     124,               /* TODO: set Blue Friday's real BPM for an accurate beat grid */
     albumId: "123456789", /* <!-- REPLACE WITH REAL BANDCAMP ALBUM ID --> */
     buyUrl:    "https://sontrarecords.bandcamp.com/album/nocturne-transmissions",
     donateUrl: "https://sontrarecords.bandcamp.com/album/nocturne-transmissions"
@@ -128,6 +129,14 @@ function audioUrlFor(r) {
   return r.audio || ("assets/audio/" + String(r.catalog).toLowerCase() + ".mp3");
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   BEAT GRID (Ableton-style). Seeking snaps to the tempo grid so a jump lands
+   in time and the rhythm stays aligned. Each release can set `bpm` (and an
+   optional `beatOffset` = seconds to the first downbeat); otherwise DEFAULT_BPM
+   is used. 4/4 is assumed. The player's snap button cycles bar → beat → off. */
+const DEFAULT_BPM   = 120;
+const BEATS_PER_BAR = 4;
+
 /* Player look (used once enabled). bg = player background, link = accent. */
 const BANDCAMP_BG   = "111111";
 const BANDCAMP_LINK = "ffffff";
@@ -169,12 +178,16 @@ function customPlayer(r) {
   const mini = big.slice(0, 16);
   const bars = arr => arr.map(h => `<span style="--h:${h}px"></span>`).join("");
 
+  const bpm        = r.bpm || DEFAULT_BPM;
+  const beatOffset = r.beatOffset || 0;
+
   // Real audio element — only rendered when self-hosted audio is enabled.
   const audioEl = AUDIO_ENABLED
     ? `<audio preload="metadata" src="${esc(audioUrlFor(r))}"></audio>` : "";
 
   return `
-      <div class="player" data-player aria-label="Player for ${esc(r.title)} by ${esc(r.artist)}">
+      <div class="player" data-player data-bpm="${esc(bpm)}" data-beat-offset="${esc(beatOffset)}"
+           aria-label="Player for ${esc(r.title)} by ${esc(r.artist)}">
         ${audioEl}
         <div class="player__bar">
           <button class="player__btn" type="button" data-play aria-label="Play / pause">
@@ -186,13 +199,19 @@ function customPlayer(r) {
             <span class="player__sub">${esc(r.artist)}</span>
           </span>
           <span class="player__mini" aria-hidden="true">${bars(mini)}</span>
+          <button class="player__snap" type="button" data-snap
+                  title="Beat-grid snap (bar / beat / off)" aria-label="Beat-grid snap">
+            <span aria-hidden="true">▦</span><span data-snap-label>BAR</span>
+          </button>
           <span class="player__time" data-time>0:00</span>
         </div>
         <div class="player__scrub" data-scrub role="slider" tabindex="0"
-             aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+             aria-label="Seek — snaps to the beat grid"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <div class="player__wave">
             <div class="player__bars" aria-hidden="true">${bars(big)}</div>
             <div class="player__bars player__bars--fg" data-fg aria-hidden="true">${bars(big)}</div>
+            <div class="player__grid" data-grid aria-hidden="true"></div>
           </div>
         </div>
       </div>`;
@@ -417,17 +436,25 @@ function initPlayers() {
 }
 
 function setupPlayer(player) {
-  const btn    = player.querySelector("[data-play]");
-  const scrub  = player.querySelector("[data-scrub]");
-  const fg     = player.querySelector("[data-fg]");
-  const timeEl = player.querySelector("[data-time]");
-  const audio  = player.querySelector("audio");   // present only when AUDIO_ENABLED
+  const btn       = player.querySelector("[data-play]");
+  const scrub     = player.querySelector("[data-scrub]");
+  const fg        = player.querySelector("[data-fg]");
+  const timeEl    = player.querySelector("[data-time]");
+  const grid      = player.querySelector("[data-grid]");
+  const snapBtn   = player.querySelector("[data-snap]");
+  const snapLabel = player.querySelector("[data-snap-label]");
+  const audio     = player.querySelector("audio");   // present only when AUDIO_ENABLED
   if (!btn || !scrub || !fg) return;
 
-  const DEMO_DURATION = 32;        // seconds, used only for the silent demo
-  let pct = 0;                     // 0..100 played
-  let playing = false;
-  let raf = null, last = 0;
+  // tempo / beat grid
+  const bpm        = parseFloat(player.dataset.bpm) || DEFAULT_BPM;
+  const beatOffset = parseFloat(player.dataset.beatOffset) || 0;
+  const beatDur    = 60 / bpm;
+  const barDur     = beatDur * BEATS_PER_BAR;
+  let   snap       = "bar";         // bar | beat | off  (Ableton-style quantize)
+
+  const DEMO_DURATION = 32;         // seconds, used only for the silent demo
+  let pct = 0, playing = false, raf = null, last = 0;
 
   const fmt = sec => {
     const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
@@ -436,6 +463,22 @@ function setupPlayer(player) {
   // total seconds: real audio duration when known, else the demo length
   const total = () =>
     (audio && audio.duration && isFinite(audio.duration)) ? audio.duration : DEMO_DURATION;
+
+  // size the visual grid (bar + beat line spacing) to tempo + duration
+  function updateGrid() {
+    if (!grid) return;
+    const t = total();
+    if (!t) return;
+    grid.style.setProperty("--beat-pct", (beatDur / t * 100) + "%");
+    grid.style.setProperty("--bar-pct",  (barDur  / t * 100) + "%");
+  }
+  // snap a time (seconds) to the nearest grid unit → jumps stay in rhythm
+  function quantize(sec) {
+    if (snap === "off") return sec;
+    const unit = snap === "bar" ? barDur : beatDur;
+    const q = beatOffset + Math.round((sec - beatOffset) / unit) * unit;
+    return Math.max(0, Math.min(total(), q));
+  }
 
   function render() {
     fg.style.clipPath = "inset(0 " + (100 - pct) + "% 0 0)";   // reveal played bars
@@ -475,14 +518,16 @@ function setupPlayer(player) {
 
   if (audio) {
     audio.addEventListener("ended", () => { stop(); pct = 0; render(); });
-    audio.addEventListener("loadedmetadata", render);   // refresh the time once known
+    audio.addEventListener("loadedmetadata", () => { updateGrid(); render(); });
   }
 
   btn.addEventListener("click", () => { playing ? stop() : play(); });
 
+  // seek to a percentage, QUANTIZED to the beat grid — no stop, so it stays in time
   function seekTo(p) {
-    pct = Math.max(0, Math.min(100, p));
-    if (audio && audio.duration) audio.currentTime = (pct / 100) * audio.duration;
+    const sec = quantize((Math.max(0, Math.min(100, p)) / 100) * total());
+    pct = total() ? (sec / total()) * 100 : 0;
+    if (audio && audio.duration) audio.currentTime = sec;
     render();
   }
   scrub.addEventListener("click", e => {
@@ -490,10 +535,23 @@ function setupPlayer(player) {
     seekTo(((e.clientX - r.left) / r.width) * 100);
   });
   scrub.addEventListener("keydown", e => {
-    if (e.key === "ArrowRight")     { seekTo(pct + 5); e.preventDefault(); }
-    else if (e.key === "ArrowLeft") { seekTo(pct - 5); e.preventDefault(); }
+    // arrows jump exactly one grid unit (or 5% when snap is off)
+    const stepPct = snap === "off" ? 5 : ((snap === "beat" ? beatDur : barDur) / total()) * 100;
+    if (e.key === "ArrowRight")     { seekTo(pct + stepPct); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { seekTo(pct - stepPct); e.preventDefault(); }
   });
 
+  // beat-grid snap control: cycle bar → beat → off
+  if (snapBtn) {
+    const MODES = ["bar", "beat", "off"];
+    snapBtn.addEventListener("click", () => {
+      snap = MODES[(MODES.indexOf(snap) + 1) % MODES.length];
+      if (snapLabel) snapLabel.textContent = snap.toUpperCase();
+      player.classList.toggle("snap-off", snap === "off");
+    });
+  }
+
+  updateGrid();
   render();
 }
 

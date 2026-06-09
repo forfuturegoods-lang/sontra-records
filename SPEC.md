@@ -4,8 +4,8 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.4.2
-- **Status:** Implemented (self-hosted audio player; silent demo until enabled — see §11)
+- **Spec version:** 1.5.0
+- **Status:** Implemented (self-hosted audio player + beat grid; silent demo until enabled — see §11)
 - **Last updated:** 2026-06-09
 
 ---
@@ -60,7 +60,10 @@ cover (path), albumId (Bandcamp), buyUrl, donateUrl
   in `assets/audio/` named `<catalog>.mp3` (e.g. `sr-012.mp3`), or set an explicit
   `audio:` path per release (any browser format: mp3/m4a/ogg/wav). With audio off
   it runs as a silent visual demo. `customPlayer()` builds it; `setupPlayer()`
-  wires playback. *Optional:* Bandcamp embeds remain available via
+  wires playback. **Beat grid (Ableton-style):** each release has a `bpm`; the
+  player draws a tempo grid on the waveform and seeking **snaps to it** (snap
+  control cycles bar / beat / off) so jumps land in time. *Optional:* Bandcamp
+  embeds remain available via
   `BANDCAMP_ENABLED` + a real `albumId` (`bandcampSrc`, styled
   `bgcol=111111 / linkcol=ffffff`).
 - **Email:** `<form class="subscribe__form">` posts to a provider. Placeholder
@@ -152,7 +155,16 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   portrait, cropped square in cards). Genre = House, year = 2026 (confirmed by
   label). Audio (when enabled) resolves to `assets/audio/str001.mp3`.
   Buy/Donate still point to placeholder Bandcamp URLs — revisit since the site is
-  now no-Bandcamp. Shown via CSS
+  now no-Bandcamp.
+- **2026-06-09 — Beat grid (Ableton-style quantized seeking).** The player draws
+  a tempo grid on the waveform (bold bar lines + faint beat lines, from a
+  release's `bpm`, 4/4) and **snaps seeking to the grid**, so a jump lands in time
+  and the groove stays aligned. A snap control cycles bar → beat → off; arrows
+  step one grid unit. Works in the silent demo and on real audio (snaps
+  `audio.currentTime`). `bpm` is per-release (`DEFAULT_BPM` otherwise) with an
+  optional `beatOffset` for the first downbeat; Blue Friday's `bpm` (124) is a
+  placeholder pending the real value. _(Studio-grade gapless re-trigger would be
+  a Web Audio upgrade.)_ Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in

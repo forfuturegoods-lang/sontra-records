@@ -629,6 +629,48 @@ h1, h2, h3, h4 {
 .player__bars--fg { position: absolute; inset: 0; clip-path: inset(0 100% 0 0); pointer-events: none; }
 .player__bars--fg span { background: var(--btn-hover); }
 
+/* Beat grid overlay (Ableton-style): bold bar lines + faint beat lines, sized
+   to tempo/duration by JS via --bar-pct / --beat-pct. Drawn over the waveform. */
+.player__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --bar-pct: 25%;
+  --beat-pct: 6.25%;
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0,
+      transparent calc(var(--bar-pct) - 1px),
+      rgba(208, 208, 208, 0.32) calc(var(--bar-pct) - 1px),
+      rgba(208, 208, 208, 0.32) var(--bar-pct)),
+    repeating-linear-gradient(90deg, transparent 0,
+      transparent calc(var(--beat-pct) - 1px),
+      rgba(208, 208, 208, 0.10) calc(var(--beat-pct) - 1px),
+      rgba(208, 208, 208, 0.10) var(--beat-pct));
+}
+.player.snap-off .player__grid { opacity: 0.22; }   /* grid still visible, snap disabled */
+
+/* Beat-grid snap control — appears while playing. */
+.player__snap {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  font-family: var(--font);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+.player__snap:hover { border-color: var(--btn-hover); }
+.player.is-playing .player__snap { display: inline-flex; }
+.player.snap-off .player__snap { color: var(--text-dim); }
+
 /* ── Hero featured release (cover left · meta + player + actions right) ──── */
 .hero__brand {
   display: flex;
