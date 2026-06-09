@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.2.1
+- **Spec version:** 1.2.2
 - **Status:** Implemented (interface-first; player placeholder — see §11)
 - **Last updated:** 2026-06-09
 
@@ -118,7 +118,13 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 - **2026-06-09 — Brand logo added.** Sontra Records logo
   (`assets/sontra-logo.jpg`, white-on-black) placed top-left in the navbar on all
   pages, featured large in the homepage hero, and set as favicon; the redundant
-  text wordmark/logotype was removed. Shown via CSS
+  text wordmark/logotype was removed.
+- **2026-06-09 — Hero layout + logo sizing.** Hero is now two columns: brand
+  (logo + tagline + status) on the left, the "Get notified about new releases"
+  subscribe card moved to the **top-right** (compact variant). Hero logo enlarged
+  ~25% (`clamp(275–450px)`); the navbar/header logo reduced ~50% (40→20px). The
+  separate mid-page subscribe section was removed; `#subscribe` now resolves to
+  the hero card. Stacks to one column ≤820px. Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in

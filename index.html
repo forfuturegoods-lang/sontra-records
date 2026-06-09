@@ -49,13 +49,37 @@
          =================================================================== -->
     <section class="hero">
       <div class="container hero__inner">
-        <h1 class="hero__logo">
-          <img src="assets/sontra-logo.jpg" alt="Sontra Records" />
-        </h1>
-        <p class="hero__tagline">Independent. Electronic. Uncompromising.</p>
-        <div class="hero__status">
-          <span class="pulse"></span>
-          <span><span data-release-count>0</span> releases in catalog</span>
+        <div class="hero__brand">
+          <h1 class="hero__logo">
+            <img src="assets/sontra-logo.jpg" alt="Sontra Records" />
+          </h1>
+          <p class="hero__tagline">Independent. Electronic. Uncompromising.</p>
+          <div class="hero__status">
+            <span class="pulse"></span>
+            <span><span data-release-count>0</span> releases in catalog</span>
+          </div>
+        </div>
+
+        <!-- Subscribe — featured top-right of the hero -->
+        <div class="hero__subscribe">
+          <div class="subscribe subscribe--compact" id="subscribe">
+            <span class="eyebrow">Mailing list</span>
+            <h2>Get notified about new releases</h2>
+            <p>No spam — just a heads-up when we press something new.</p>
+
+            <!-- SUBSCRIBE FORM — to go live, set action to your Formspree/Mailchimp endpoint. -->
+            <form class="subscribe__form"
+                  action="https://formspree.io/f/YOUR_FORM_ID"
+                  method="POST">
+              <input class="subscribe__input"
+                     type="email" name="email"
+                     placeholder="you@email.com"
+                     aria-label="Email address" required />
+              <button class="btn btn--solid btn--block" type="submit">Subscribe</button>
+            </form>
+
+            <p class="form-msg" role="status" aria-live="polite"></p>
+          </div>
         </div>
       </div>
     </section>
@@ -88,38 +112,8 @@
       </div>
     </section>
 
-    <!-- ===================================================================
-         SUBSCRIBE
-         =================================================================== -->
-    <section class="section" id="subscribe">
-      <div class="container">
-        <div class="subscribe">
-          <span class="eyebrow">Mailing list</span>
-          <h2 style="margin-top:14px">Get notified about new releases</h2>
-          <p>No spam. Just a heads-up when we press something new. Unsubscribe anytime.</p>
-
-          <!-- ===========================================================
-               SUBSCRIBE FORM
-               To go live, replace the action below with your provider:
-                 • Formspree:  action="https://formspree.io/f/YOUR_FORM_ID"
-                 • Mailchimp:  paste your embedded form markup instead
-               Until then, the form shows a friendly placeholder message.
-               =========================================================== -->
-          <form class="subscribe__form"
-                action="https://formspree.io/f/YOUR_FORM_ID"
-                method="POST">
-            <input class="subscribe__input"
-                   type="email" name="email"
-                   placeholder="you@email.com"
-                   aria-label="Email address" required />
-            <button class="btn btn--solid" type="submit">Subscribe</button>
-          </form>
-
-          <p class="form-msg" role="status" aria-live="polite"></p>
-          <p class="subscribe__note">Powered by Bandcamp · Built for the underground</p>
-        </div>
-      </div>
-    </section>
+    <!-- Subscribe is featured in the hero (top-right) — see the .hero__subscribe block. -->
+    <!-- Footer links to #subscribe still resolve (the id moved to the hero card). -->
   </main>
 
   <!-- =====================================================================
