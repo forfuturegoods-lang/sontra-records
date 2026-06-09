@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin — Sontra Records</title>
+
+  <link rel="icon" href="assets/sontra-logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+
+  <!-- Supabase client + your project keys -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body>
+  <main class="admin">
+
+    <div class="admin__top">
+      <div class="admin__title">Sontra Records <small>Label Admin</small></div>
+      <div class="admin__user hidden" id="userbox">
+        <span id="user-email"></span>
+        <button class="btn btn--outline" id="logout-btn" type="button">Log out</button>
+      </div>
+    </div>
+
+    <!-- shown when Supabase keys aren't set yet -->
+    <div class="notice hidden" id="setup-notice">
+      <b>Supabase isn't connected yet.</b><br />
+      Add your project URL and anon key in <code>supabase-config.js</code>, then run
+      <code>supabase/schema.sql</code> in the Supabase SQL editor. Full steps are in
+      <code>ADMIN-SETUP.md</code>. Once connected, this page becomes the team login + uploader.
+    </div>
+
+    <!-- LOGIN -->
+    <section class="login hidden" id="login">
+      <h2>Team sign in</h2>
+      <p>Use the email + password your label admin set up for you.</p>
+      <form id="login-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input class="input" type="email" id="email" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input class="input" type="password" id="password" autocomplete="current-password" required />
+        </div>
+        <button class="btn btn--solid btn--block" type="submit">Sign in</button>
+        <p class="msg" id="login-msg" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="admin__layout hidden" id="dashboard">
+
+      <!-- create / edit -->
+      <div class="panel">
+        <h2 id="form-title">New release</h2>
+        <form id="release-form">
+          <input type="hidden" id="rel-id" />
+          <div class="grid2">
+            <div class="field"><label for="rel-catalog">Catalog *</label>
+              <input class="input" id="rel-catalog" placeholder="STR002" required /></div>
+            <div class="field"><label for="rel-year">Year</label>
+              <input class="input" id="rel-year" type="number" placeholder="2026" /></div>
+          </div>
+          <div class="field"><label for="rel-title">Title *</label>
+            <input class="input" id="rel-title" placeholder="Track title" required /></div>
+          <div class="field"><label for="rel-artist">Artist *</label>
+            <input class="input" id="rel-artist" placeholder="Artist name" required /></div>
+          <div class="grid3">
+            <div class="field"><label for="rel-genre">Genre</label>
+              <input class="input" id="rel-genre" placeholder="House" /></div>
+            <div class="field"><label for="rel-bpm">BPM</label>
+              <input class="input" id="rel-bpm" type="number" step="0.01" placeholder="124" /></div>
+            <div class="field"><label for="rel-offset">Beat offset (s)</label>
+              <input class="input" id="rel-offset" type="number" step="0.001" placeholder="0" /></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label for="rel-buy">Buy URL</label>
+              <input class="input" id="rel-buy" placeholder="https://…" /></div>
+            <div class="field"><label for="rel-donate">Donate URL</label>
+              <input class="input" id="rel-donate" placeholder="https://…" /></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label for="rel-cover">Artwork (jpg/png)</label>
+              <input class="input" id="rel-cover" type="file" accept="image/*" /></div>
+            <div class="field"><label for="rel-audio">Audio (WAV 24-bit/44.1kHz)</label>
+              <input class="input" id="rel-audio" type="file" accept="audio/*,.wav" /></div>
+          </div>
+          <div class="actions-row">
+            <button class="btn btn--solid" type="submit" id="save-btn">Save release</button>
+            <button class="btn btn--outline hidden" type="button" id="cancel-btn">Cancel edit</button>
+          </div>
+          <p class="msg" id="form-msg" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <!-- list -->
+      <div class="panel">
+        <h2>Catalog</h2>
+        <div class="rel-list" id="rel-list"><p class="muted">Loading…</p></div>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>

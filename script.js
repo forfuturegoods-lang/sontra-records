@@ -182,8 +182,10 @@ function customPlayer(r) {
   const bpm        = r.bpm || DEFAULT_BPM;
   const beatOffset = r.beatOffset || 0;
 
-  // Web Audio fetches + decodes this URL for gapless playback (when audio is on).
-  const audioAttr = AUDIO_ENABLED ? `data-audio="${esc(audioUrlFor(r))}"` : "";
+  // Web Audio fetches + decodes this URL (gapless). Prefer the release's own
+  // audio URL (e.g. from Supabase); else the convention path when AUDIO_ENABLED.
+  const audioSrc  = r.audio || (AUDIO_ENABLED ? audioUrlFor(r) : "");
+  const audioAttr = audioSrc ? `data-audio="${esc(audioSrc)}"` : "";
 
   return `
       <div class="player" data-player ${audioAttr} data-bpm="${esc(bpm)}" data-beat-offset="${esc(beatOffset)}"
@@ -319,7 +321,7 @@ function initNav() {
    FILTERS (releases page) — build year + genre toggle buttons from the data,
    then show/hide cards. Pure CSS/JS, no backend.
    ────────────────────────────────────────────────────────────────────────── */
-function initFilters() {
+function initFilters(releases) {
   const yearBar  = document.getElementById("filter-years");
   const genreBar = document.getElementById("filter-genres");
   const grid     = document.getElementById("releases-grid");
@@ -329,9 +331,9 @@ function initFilters() {
   // current selection ("all" means no filter)
   const state = { year: "all", genre: "all" };
 
-  // unique, sorted values pulled straight from RELEASES
-  const years  = [...new Set(RELEASES.map(r => r.year))].sort((a, b) => b - a);
-  const genres = [...new Set(RELEASES.map(r => r.genre))].sort();
+  // unique, sorted values pulled straight from the loaded releases
+  const years  = [...new Set(releases.map(r => r.year))].sort((a, b) => b - a);
+  const genres = [...new Set(releases.map(r => r.genre))].sort();
 
   // build a row of pill toggles into `bar`; clicking sets state[key]
   function buildToggles(bar, key, values) {
@@ -624,28 +626,63 @@ function setupPlayer(player) {
 /* ──────────────────────────────────────────────────────────────────────────
    BOOT — runs after the DOM is ready
    ────────────────────────────────────────────────────────────────────────── */
-document.addEventListener("DOMContentLoaded", () => {
+/* Load releases from Supabase when configured, else the built-in RELEASES. */
+async function loadReleasesData() {
+  if (window.supabaseReady && window.supabaseReady()) {
+    const c = window.supabaseClient && window.supabaseClient();
+    if (c) {
+      try {
+        const { data, error } = await c.from("releases").select("*")
+          .order("position", { ascending: true })
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        if (data && data.length) return data.map(mapReleaseRow);
+      } catch (e) {
+        console.warn("Supabase load failed — using built-in catalog.", e);
+      }
+    }
+  }
+  return RELEASES;
+}
+
+/* Map a Supabase row to the shape the renderers expect. */
+function mapReleaseRow(row) {
+  return {
+    catalog: row.catalog, title: row.title, artist: row.artist,
+    year: row.year, genre: row.genre, bpm: row.bpm, beatOffset: row.beat_offset || 0,
+    cover: window.storagePublicUrl("covers", row.cover_path) || "assets/covers/cover-01.svg",
+    audio: window.storagePublicUrl("audio", row.audio_path) || "",
+    buyUrl: row.buy_url || "#", donateUrl: row.donate_url || "#"
+  };
+}
+
+document.addEventListener("DOMContentLoaded", initSite);
+
+async function initSite() {
   initNav();
+  initSubscribe();
+
+  const y = document.getElementById("copyright-year");
+  if (y) y.textContent = "2024–2026"; // static range; update as needed
+
+  const releases = await loadReleasesData();   // Supabase or built-in fallback
 
   // Homepage hero: feature the newest release (with its interactive player).
   const heroEl = document.getElementById("hero-feature");
-  if (heroEl && RELEASES.length) heroEl.innerHTML = heroFeatureCard(RELEASES[0]);
+  if (heroEl && releases.length) heroEl.innerHTML = heroFeatureCard(releases[0]);
 
   // Homepage grids: the newest is featured above, so show the rest here.
-  renderInto("latest-grid", RELEASES.slice(1, 4));
-  renderInto("all-grid",    RELEASES.slice(4));
+  renderInto("latest-grid", releases.slice(1, 4));
+  renderInto("all-grid",    releases.slice(4));
 
   // Releases page: render the full catalog, then wire up the filters.
-  renderInto("releases-grid", RELEASES);
-  initFilters();
+  renderInto("releases-grid", releases);
+  initFilters(releases);
 
-  initSubscribe();
-  initPlayers();          // wire up the interactive placeholder players
+  initPlayers();          // wire up the interactive players
 
-  // Footer year + release count, if those elements exist.
-  const y = document.getElementById("copyright-year");
-  if (y) y.textContent = "2024–2026"; // static range; update as needed
+  // Footer release count, if present.
   document.querySelectorAll("[data-release-count]").forEach(el => {
-    el.textContent = RELEASES.length;
+    el.textContent = releases.length;
   });
-});
+}

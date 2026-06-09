@@ -4,8 +4,8 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.6.1
-- **Status:** Implemented (Web Audio player + beat grid; silent demo until enabled — see §11)
+- **Spec version:** 1.7.0
+- **Status:** Implemented (Web Audio player + beat grid + Supabase admin/CMS — see §11)
 - **Last updated:** 2026-06-09
 
 ---
@@ -39,15 +39,17 @@ Shared components: sticky navbar (hamburger ≤680px), release card, footer.
 
 ## 5. Data model — single source of truth
 
-Releases live in the `RELEASES` array in `script.js`. Both the homepage and
-releases page render from it. Each release:
+Releases load from **Supabase** when configured (the team manages them via
+`admin.html`); otherwise the public site falls back to the built-in `RELEASES`
+array in `script.js`. Both map to the same shape the homepage + releases page
+render from. Each release:
 
 ```
-catalog, title, artist, year (number), genre (string),
-cover (path), albumId (Bandcamp), buyUrl, donateUrl
+catalog, title, artist, year, genre, bpm, beatOffset,
+cover (image), audio (file/URL), buyUrl, donateUrl
 ```
 
-- Homepage: `slice(0,3)` = Latest, `slice(3)` = All.
+- Homepage: `[0]` featured in the hero, `slice(1,4)` = Latest, `slice(4)` = All.
 - Releases page: all releases; year + genre filter toggles are generated from
   the distinct values in the data.
 
@@ -178,7 +180,19 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 - **2026-06-09 — Audio format: WAV 24-bit / 44.1 kHz.** Default file convention
   changed from `.mp3` to `assets/audio/<catalog>.wav`; the Web Audio engine
   decodes 24-bit PCM WAV natively (other formats still work via an explicit
-  `audio:` path). `audioUrlFor()` + the audio README updated. Shown via CSS
+  `audio:` path). `audioUrlFor()` + the audio README updated.
+- **2026-06-09 — Supabase admin/CMS (team-run, off personal GitHub).** Added a
+  team content backend on Supabase so the label is run by non-technical staff
+  without touching git. New files: `admin.html` / `admin.js` / `admin.css`
+  (login via Supabase Auth, then create/edit/delete releases + upload artwork &
+  audio to Storage), `supabase/schema.sql` (releases table + `covers`/`audio`
+  buckets + RLS: public read, authenticated write), `supabase-config.js` (URL +
+  anon key — blank until set), and `ADMIN-SETUP.md` (one-time setup guide). The
+  public site now loads releases from Supabase when configured (`loadReleasesData`
+  / `mapReleaseRow`, async boot `initSite`), falling back to the built-in
+  `RELEASES` array otherwise; the player uses each release's own `audio` URL when
+  present. Not yet runtime-tested against a live project (needs the user's
+  Supabase URL + key) — verify after setup. Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in
