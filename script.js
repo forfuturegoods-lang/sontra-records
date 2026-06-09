@@ -110,10 +110,11 @@ const RELEASES = [
    PLAYER MODE — pick how the players get their audio. NO Bandcamp required.
 
    1) SELF-HOSTED AUDIO (recommended — uses this site's own waveform player):
-        • Drop each track in  assets/audio/  named  <catalog>.mp3
-          e.g.  assets/audio/sr-012.mp3   (lower-case catalog number)
-          — or set an explicit `audio:` path on a release in RELEASES to override.
-          Any browser-playable format works: .mp3 .m4a .ogg .wav
+        • Drop each track in  assets/audio/  named  <catalog>.wav
+          e.g.  assets/audio/str001.wav   (lower-case catalog number).
+          Master target: WAV, 24-bit, 44.1 kHz (decoded natively by Web Audio).
+          Any other browser-decodable format also works (.wav .mp3 .m4a .ogg) —
+          or set an explicit `audio:` path on a release in RELEASES to override.
         • Then set  AUDIO_ENABLED = true  below.
 
    2) BANDCAMP EMBED (optional alternative): set BANDCAMP_ENABLED = true and give
@@ -124,9 +125,9 @@ const AUDIO_ENABLED    = false;   // ← flip to true once your audio files are 
 const BANDCAMP_ENABLED = false;   // ← optional: use Bandcamp embeds instead
 
 /* Resolve a release's audio file: explicit `audio:` path, else the convention
-   assets/audio/<catalog>.mp3 (catalog lower-cased). */
+   assets/audio/<catalog>.wav (catalog lower-cased; WAV 24-bit / 44.1 kHz). */
 function audioUrlFor(r) {
-  return r.audio || ("assets/audio/" + String(r.catalog).toLowerCase() + ".mp3");
+  return r.audio || ("assets/audio/" + String(r.catalog).toLowerCase() + ".wav");
 }
 
 /* ─────────────────────────────────────────────────────────────────────────

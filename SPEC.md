@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.6.0
+- **Spec version:** 1.6.1
 - **Status:** Implemented (Web Audio player + beat grid; silent demo until enabled — see §11)
 - **Last updated:** 2026-06-09
 
@@ -57,7 +57,7 @@ cover (path), albumId (Bandcamp), buyUrl, donateUrl
   site's own player: an interactive **waveform scrubber** (press play → the
   waveform drops to full width; click / arrow-keys to seek). Power it by hosting
   your own audio — set `AUDIO_ENABLED = true` in `script.js` and drop each track
-  in `assets/audio/` named `<catalog>.mp3` (e.g. `sr-012.mp3`), or set an explicit
+  in `assets/audio/` named `<catalog>.wav` (e.g. `str001.wav`, WAV 24-bit/44.1 kHz), or set an explicit
   `audio:` path per release (any browser format: mp3/m4a/ogg/wav). With audio off
   it runs as a silent visual demo. `customPlayer()` builds it; `setupPlayer()`
   wires playback via the **Web Audio API** (decode-once buffer playback —
@@ -85,7 +85,7 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 
 ## 9. Open items / backlog
 
-- [ ] Add audio to `assets/audio/` (named `<catalog>.mp3`) + set `AUDIO_ENABLED = true` for real playback. _(self-hosted, no Bandcamp; silent demo until then — see §11. Bandcamp embeds remain an optional alternative.)_
+- [ ] Add audio to `assets/audio/` (named `<catalog>.wav`, WAV 24-bit/44.1 kHz) + set `AUDIO_ENABLED = true` for real playback. _(self-hosted, no Bandcamp; silent demo until then — see §11. Bandcamp embeds remain an optional alternative.)_
 - [ ] Replace placeholder cover art in `assets/covers/`.
 - [ ] Set real Formspree/Mailchimp form action. _(deferred — `action` left as `YOUR_FORM_ID`; form shows a friendly confirmation until wired.)_
 - [ ] Replace placeholder Bandcamp/social URLs in footers.
@@ -145,7 +145,7 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 - **2026-06-09 — Self-hosted audio player (no Bandcamp).** The custom waveform
   player now plays a real `<audio>` element when `AUDIO_ENABLED = true`: progress
   and seek are driven by the audio's `currentTime`/`duration`; one track plays at
-  a time. Audio resolves from `assets/audio/<catalog>.mp3` (or a release's
+  a time. Audio resolves from `assets/audio/<catalog>.wav` (or a release's
   explicit `audio:` path). With it off, the player stays a silent demo. Player
   meta now shows the track title/artist (was "coming soon / bandcamp"); each
   release's waveform is rotated by a catalog seed so they look different. Bandcamp
@@ -154,7 +154,7 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   placeholder newest release: `RELEASES[0]` → catalog `STR001`, "Blue Friday" by
   "Sontra Crew", cover `assets/covers/str001-blue-friday.jpg` (user-supplied;
   portrait, cropped square in cards). Genre = House, year = 2026 (confirmed by
-  label). Audio (when enabled) resolves to `assets/audio/str001.mp3`.
+  label). Audio (when enabled) resolves to `assets/audio/str001.wav`.
   Buy/Donate still point to placeholder Bandcamp URLs — revisit since the site is
   now no-Bandcamp.
 - **2026-06-09 — Beat grid (Ableton-style quantized seeking).** The player draws
@@ -174,7 +174,11 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   shows a brief `is-loading` state while decoding. Replaces the HTML5 `<audio>`
   path (the player now reads a `data-audio` URL). Note: decoding loads the whole
   file into memory — keep web previews reasonably short. _(Not yet runtime-tested
-  with a real file — verify once audio is added.)_ Shown via CSS
+  with a real file — verify once audio is added.)_
+- **2026-06-09 — Audio format: WAV 24-bit / 44.1 kHz.** Default file convention
+  changed from `.mp3` to `assets/audio/<catalog>.wav`; the Web Audio engine
+  decodes 24-bit PCM WAV natively (other formats still work via an explicit
+  `audio:` path). `audioUrlFor()` + the audio README updated. Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in
