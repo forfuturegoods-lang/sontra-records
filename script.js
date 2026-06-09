@@ -142,20 +142,38 @@ function bandcampEmbed(r) {
       </div>`;
 }
 
-/* Styled placeholder — looks like a disabled player bar so cards read as
-   finished while we wait for sontra-bandcamp credentials. */
+/* Interactive placeholder player. Paused = compact bar; pressing play expands
+   the waveform into a full-width scrubber you can click to seek (fast-forward).
+   It's a UI demo until BANDCAMP_ENABLED swaps in the real Bandcamp embed.
+   initPlayers() wires up the behavior. */
 function bandcampPlaceholder(r) {
-  const wave = [8,16,11,22,14,26,12,20,9,24,15,18,10,21,13,19]; // static faux waveform
-  const bars = wave.map(h => `<span style="height:${h}px"></span>`).join("");
+  // static (non-random) bar heights — full scrubber + small paused indicator
+  const big  = [8,14,10,18,12,22,16,24,14,20,12,26,18,14,22,16,12,20,10,16,
+                24,14,18,12,20,16,22,12,18,10,14,20,16,24,12,18,14,22,16,12];
+  const mini = [8,16,11,22,14,26,12,20,9,24,15,18,10,21,13,19];
+  const bigBars  = big.map(h => `<span style="--h:${h}px"></span>`).join("");
+  const miniBars = mini.map(h => `<span style="--h:${h}px"></span>`).join("");
   return `
-      <div class="bandcamp bandcamp--placeholder"
-           role="img" aria-label="Bandcamp player for ${esc(r.title)} — coming soon">
-        <span class="bandcamp__ph-btn" aria-hidden="true">▶</span>
-        <span class="bandcamp__ph-meta">
-          <span class="bandcamp__ph-title">Player coming soon</span>
-          <span class="bandcamp__ph-sub">Streaming via sontra-bandcamp</span>
-        </span>
-        <span class="bandcamp__ph-wave" aria-hidden="true">${bars}</span>
+      <div class="player" data-player aria-label="Preview player for ${esc(r.title)}">
+        <div class="player__bar">
+          <button class="player__btn" type="button" data-play aria-label="Play / pause preview">
+            <span class="player__icon-play" aria-hidden="true">▶</span>
+            <span class="player__icon-pause" aria-hidden="true">❚❚</span>
+          </button>
+          <span class="player__meta">
+            <span class="player__title">Player coming soon</span>
+            <span class="player__sub">Streaming via sontra-bandcamp</span>
+          </span>
+          <span class="player__mini" aria-hidden="true">${miniBars}</span>
+          <span class="player__time" data-time>0:00</span>
+        </div>
+        <div class="player__scrub" data-scrub role="slider" tabindex="0"
+             aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="player__wave">
+            <div class="player__bars" aria-hidden="true">${bigBars}</div>
+            <div class="player__bars player__bars--fg" data-fg aria-hidden="true">${bigBars}</div>
+          </div>
+        </div>
       </div>`;
 }
 
@@ -197,6 +215,29 @@ function releaseCard(r) {
       ${bandcampPlayer(r)}
 
       <div class="release-card__actions">
+        <a class="btn btn--solid"  href="${esc(r.buyUrl)}"    target="_blank" rel="noopener">Buy on Bandcamp</a>
+        <a class="btn btn--outline" href="${esc(r.donateUrl)}" target="_blank" rel="noopener">Donate</a>
+      </div>
+    </div>
+  </article>`;
+}
+
+/* Horizontal "featured release" layout for the homepage hero (cover left,
+   meta + player + actions right). Uses the same interactive player. */
+function heroFeatureCard(r) {
+  return `
+  <article class="feature">
+    <div class="feature__art">
+      <img src="${esc(r.cover)}" alt="${esc(r.title)} — cover art" />
+      <span class="feature__catalog">${esc(r.catalog)}</span>
+    </div>
+    <div class="feature__body">
+      <span class="eyebrow">Newest release</span>
+      <h2 class="feature__title">${esc(r.title)}</h2>
+      <p class="feature__artist">${esc(r.artist)}</p>
+      <p class="feature__sub">${esc(r.genre)} · ${esc(r.year)}</p>
+      ${bandcampPlayer(r)}
+      <div class="feature__actions">
         <a class="btn btn--solid"  href="${esc(r.buyUrl)}"    target="_blank" rel="noopener">Buy on Bandcamp</a>
         <a class="btn btn--outline" href="${esc(r.donateUrl)}" target="_blank" rel="noopener">Donate</a>
       </div>
@@ -342,20 +383,99 @@ function showMsg(el, ok, text) {
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
+   INTERACTIVE PLAYER (placeholder)
+   Pressing play expands the waveform into a full-width scrubber and animates a
+   mock progress; click or arrow-keys to seek (fast-forward). Only one player
+   runs at a time. This is a UI demo until BANDCAMP_ENABLED swaps in the real
+   embed (real iframes have no [data-player], so they're skipped).
+   ────────────────────────────────────────────────────────────────────────── */
+let _activePlayer = null;
+
+function initPlayers() {
+  document.querySelectorAll("[data-player]").forEach(setupPlayer);
+}
+
+function setupPlayer(player) {
+  const btn    = player.querySelector("[data-play]");
+  const scrub  = player.querySelector("[data-scrub]");
+  const fg     = player.querySelector("[data-fg]");
+  const timeEl = player.querySelector("[data-time]");
+  if (!btn || !scrub || !fg) return;
+
+  const DURATION = 32;        // mock preview length, seconds
+  let pct = 0;                // 0..100 played
+  let playing = false;
+  let raf = null, last = 0;
+
+  const fmt = sec => {
+    const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+    return m + ":" + String(s).padStart(2, "0");
+  };
+  function render() {
+    fg.style.clipPath = "inset(0 " + (100 - pct) + "% 0 0)";   // reveal played bars
+    scrub.setAttribute("aria-valuenow", Math.round(pct));
+    if (timeEl) timeEl.textContent = fmt(DURATION * pct / 100);
+  }
+  function stop() {
+    playing = false;
+    player.classList.remove("is-playing");
+    if (raf) cancelAnimationFrame(raf);
+    raf = null; last = 0;
+    if (_activePlayer === api) _activePlayer = null;
+  }
+  function tick(now) {
+    if (!last) last = now;
+    pct += ((now - last) / 1000 / DURATION) * 100;
+    last = now;
+    if (pct >= 100) { pct = 100; render(); stop(); pct = 0; return; }
+    render();
+    raf = requestAnimationFrame(tick);
+  }
+  function play() {
+    if (_activePlayer && _activePlayer !== api) _activePlayer.stop();  // one at a time
+    playing = true; last = 0;
+    _activePlayer = api;
+    player.classList.add("is-playing");
+    raf = requestAnimationFrame(tick);
+  }
+  const api = { stop };
+
+  btn.addEventListener("click", () => { playing ? stop() : play(); });
+
+  const seek = clientX => {
+    const r = scrub.getBoundingClientRect();
+    pct = Math.max(0, Math.min(100, ((clientX - r.left) / r.width) * 100));
+    render();
+  };
+  scrub.addEventListener("click", e => seek(e.clientX));
+  scrub.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight")     { pct = Math.min(100, pct + 5); render(); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { pct = Math.max(0,   pct - 5); render(); e.preventDefault(); }
+  });
+
+  render();
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
    BOOT — runs after the DOM is ready
    ────────────────────────────────────────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
   initNav();
 
-  // Homepage: first 3 = latest, the rest = back catalog.
-  renderInto("latest-grid", RELEASES.slice(0, 3));
-  renderInto("all-grid",    RELEASES.slice(3));
+  // Homepage hero: feature the newest release (with its interactive player).
+  const heroEl = document.getElementById("hero-feature");
+  if (heroEl && RELEASES.length) heroEl.innerHTML = heroFeatureCard(RELEASES[0]);
 
-  // Releases page: render everything, then wire up the filters.
+  // Homepage grids: the newest is featured above, so show the rest here.
+  renderInto("latest-grid", RELEASES.slice(1, 4));
+  renderInto("all-grid",    RELEASES.slice(4));
+
+  // Releases page: render the full catalog, then wire up the filters.
   renderInto("releases-grid", RELEASES);
   initFilters();
 
   initSubscribe();
+  initPlayers();          // wire up the interactive placeholder players
 
   // Footer year + release count, if those elements exist.
   const y = document.getElementById("copyright-year");

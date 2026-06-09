@@ -4,8 +4,8 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.2.2
-- **Status:** Implemented (interface-first; player placeholder — see §11)
+- **Spec version:** 1.3.0
+- **Status:** Implemented (interface-first; interactive player demo — see §11)
 - **Last updated:** 2026-06-09
 
 ---
@@ -55,6 +55,8 @@ cover (path), albumId (Bandcamp), buyUrl, donateUrl
 
 - **Bandcamp:** *interface-first.* Each release card renders a styled **player
   placeholder** until the `sontra-bandcamp` account + real album IDs are ready.
+  The placeholder is **interactive** — pressing play expands a full-width waveform
+  scrubber you can click to seek (a UI demo; no audio until enabled).
   A single flag in `script.js` — `BANDCAMP_ENABLED` (default `false`) — swaps
   every placeholder for the real embed (`bandcampSrc(albumId)`, styled
   `bgcol=111111 / linkcol=ffffff`). Placeholder IDs flagged
@@ -99,7 +101,7 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   which makes `script.js` show a friendly confirmation instead of posting.
   Placeholder release titles/artists are kept. These placeholders are
   **intentional, not bugs.** To go live: supply the values, wire them in, and
-  bump the spec to `1.3.0`.
+  bump the spec to `1.4.0`.
 - **2026-06-09 — Interface-first: Bandcamp player placeholder.** Release cards
   render a styled disabled-player placeholder ("Player coming soon · streaming
   via sontra-bandcamp") instead of a live embed with fake IDs. Controlled by
@@ -124,7 +126,15 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   subscribe card moved to the **top-right** (compact variant). Hero logo enlarged
   ~25% (`clamp(275–450px)`); the navbar/header logo reduced ~50% (40→20px). The
   separate mid-page subscribe section was removed; `#subscribe` now resolves to
-  the hero card. Stacks to one column ≤820px. Shown via CSS
+  the hero card. Stacks to one column ≤820px.
+- **2026-06-09 — Hero features the newest release + interactive player.** The
+  hero's big logo was replaced by the newest release (`RELEASES[0]`) shown as a
+  horizontal feature (cover + meta + player + buy/donate). The placeholder player
+  is now interactive: pressing play hides the mini wave and **drops a full-width
+  waveform scrubber** (click / arrow-keys to seek), with mock progress + a running
+  time; only one plays at a time. Homepage grids now render `slice(1,4)` /
+  `slice(4)` so the featured release isn't duplicated. The logo remains in the
+  navbar + favicon. Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in
