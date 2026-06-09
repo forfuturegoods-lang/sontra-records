@@ -506,6 +506,66 @@ h1, h2, h3, h4 {
   border: 0;
 }
 
+/* Player placeholder (interface-first) — a disabled-looking player bar shown
+   until BANDCAMP_ENABLED is flipped on in script.js. */
+.bandcamp--placeholder {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  min-height: 92px;
+  /* faint diagonal hatch reads as "inactive / coming soon" */
+  background: repeating-linear-gradient(
+    45deg, #121212, #121212 11px, #161616 11px, #161616 22px);
+}
+
+.bandcamp__ph-btn {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  padding-left: 2px;            /* optically center the ▶ glyph */
+  color: var(--text-dim);
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+}
+
+.bandcamp__ph-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.bandcamp__ph-title {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.bandcamp__ph-sub {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--text-dim);
+}
+
+.bandcamp__ph-wave {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 28px;
+}
+
+.bandcamp__ph-wave span {
+  width: 3px;
+  background: var(--border-strong);
+  border-radius: 1px;
+}
+
 /* ------------------------------------------------------------------ */
 /* 11. FILTER BAR (releases page)                                     */
 /* ------------------------------------------------------------------ */

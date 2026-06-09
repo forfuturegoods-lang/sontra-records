@@ -105,6 +105,16 @@ const RELEASES = [
    These match the dark theme. Change once, applies to every embed.
    bg = 111111 (player background), link = ffffff (link/accent color).
    ────────────────────────────────────────────────────────────────────────── */
+/* INTERFACE-FIRST TOGGLE.
+   Until the `sontra-bandcamp` credentials + real album IDs are ready, each
+   release shows a styled PLACEHOLDER where the player will go — so the layout
+   looks finished instead of loading a broken embed with fake IDs.
+
+   ► TO ENABLE REAL PLAYERS LATER: set this to true (after putting real album
+     IDs into the RELEASES array). Nothing else needs to change. */
+const BANDCAMP_ENABLED = false;
+
+/* Player look (used once enabled). bg = player background, link = accent. */
 const BANDCAMP_BG   = "111111";
 const BANDCAMP_LINK = "ffffff";
 
@@ -118,6 +128,40 @@ function bandcampSrc(albumId) {
     "/linkcol=" + BANDCAMP_LINK +
     "/tracklist=false/artwork=small/transparent=true/"
   );
+}
+
+/* The real Bandcamp embed — rendered only when BANDCAMP_ENABLED is true. */
+function bandcampEmbed(r) {
+  return `
+      <div class="bandcamp">
+        <iframe
+          title="${esc(r.title)} by ${esc(r.artist)} — Bandcamp player"
+          src="${bandcampSrc(r.albumId)}"
+          seamless loading="lazy">
+        </iframe>
+      </div>`;
+}
+
+/* Styled placeholder — looks like a disabled player bar so cards read as
+   finished while we wait for sontra-bandcamp credentials. */
+function bandcampPlaceholder(r) {
+  const wave = [8,16,11,22,14,26,12,20,9,24,15,18,10,21,13,19]; // static faux waveform
+  const bars = wave.map(h => `<span style="height:${h}px"></span>`).join("");
+  return `
+      <div class="bandcamp bandcamp--placeholder"
+           role="img" aria-label="Bandcamp player for ${esc(r.title)} — coming soon">
+        <span class="bandcamp__ph-btn" aria-hidden="true">▶</span>
+        <span class="bandcamp__ph-meta">
+          <span class="bandcamp__ph-title">Player coming soon</span>
+          <span class="bandcamp__ph-sub">Streaming via sontra-bandcamp</span>
+        </span>
+        <span class="bandcamp__ph-wave" aria-hidden="true">${bars}</span>
+      </div>`;
+}
+
+/* Choose embed vs placeholder based on the flag. */
+function bandcampPlayer(r) {
+  return BANDCAMP_ENABLED ? bandcampEmbed(r) : bandcampPlaceholder(r);
 }
 
 /* Small helper: escape text so titles/artists can safely contain &, <, > etc. */
@@ -148,15 +192,9 @@ function releaseCard(r) {
         <p class="release-card__sub">${esc(r.genre)} · ${esc(r.year)}</p>
       </div>
 
-      <!-- Bandcamp embed (dark panel). Player look set by BANDCAMP_* above. -->
-      <!-- REPLACE WITH REAL BANDCAMP ALBUM ID via the RELEASES array, not here. -->
-      <div class="bandcamp">
-        <iframe
-          title="${esc(r.title)} by ${esc(r.artist)} — Bandcamp player"
-          src="${bandcampSrc(r.albumId)}"
-          seamless loading="lazy">
-        </iframe>
-      </div>
+      <!-- Bandcamp player slot. Shows a styled placeholder until BANDCAMP_ENABLED
+           is set to true. Real album IDs live in the RELEASES array, not here. -->
+      ${bandcampPlayer(r)}
 
       <div class="release-card__actions">
         <a class="btn btn--solid"  href="${esc(r.buyUrl)}"    target="_blank" rel="noopener">Buy on Bandcamp</a>

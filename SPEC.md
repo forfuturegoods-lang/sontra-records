@@ -4,8 +4,8 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.0.3
-- **Status:** Implemented (placeholder mode — see §11)
+- **Spec version:** 1.1.0
+- **Status:** Implemented (interface-first; player placeholder — see §11)
 - **Last updated:** 2026-06-09
 
 ---
@@ -53,8 +53,11 @@ cover (path), albumId (Bandcamp), buyUrl, donateUrl
 
 ## 6. Integrations
 
-- **Bandcamp:** embed URL built by `bandcampSrc(albumId)`; styled
-  `bgcol=111111 / linkcol=ffffff`. Placeholder IDs flagged
+- **Bandcamp:** *interface-first.* Each release card renders a styled **player
+  placeholder** until the `sontra-bandcamp` account + real album IDs are ready.
+  A single flag in `script.js` — `BANDCAMP_ENABLED` (default `false`) — swaps
+  every placeholder for the real embed (`bandcampSrc(albumId)`, styled
+  `bgcol=111111 / linkcol=ffffff`). Placeholder IDs flagged
   `REPLACE WITH REAL BANDCAMP ALBUM ID`.
 - **Email:** `<form class="subscribe__form">` posts to a provider. Placeholder
   `action="https://formspree.io/f/YOUR_FORM_ID"`; until a real action is set,
@@ -74,7 +77,7 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 
 ## 9. Open items / backlog
 
-- [ ] Replace 6 placeholder Bandcamp album IDs with real ones. _(deferred — intentional placeholders; site runs in placeholder mode, see §11.)_
+- [ ] Add real Bandcamp album IDs + set `BANDCAMP_ENABLED = true` to enable players. _(deferred until sontra-bandcamp credentials ready; cards show a player placeholder meanwhile — see §11.)_
 - [ ] Replace placeholder cover art in `assets/covers/`.
 - [ ] Set real Formspree/Mailchimp form action. _(deferred — `action` left as `YOUR_FORM_ID`; form shows a friendly confirmation until wired.)_
 - [ ] Replace placeholder Bandcamp/social URLs in footers.
@@ -96,7 +99,12 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   which makes `script.js` show a friendly confirmation instead of posting.
   Placeholder release titles/artists are kept. These placeholders are
   **intentional, not bugs.** To go live: supply the values, wire them in, and
-  bump the spec to `1.1.0`.
+  bump the spec to `1.2.0`.
+- **2026-06-09 — Interface-first: Bandcamp player placeholder.** Release cards
+  render a styled disabled-player placeholder ("Player coming soon · streaming
+  via sontra-bandcamp") instead of a live embed with fake IDs. Controlled by
+  `BANDCAMP_ENABLED` (`false`) in `script.js`; flip to `true` once real album IDs
+  are in. Lets the layout ship finished while waiting on sontra-bandcamp creds.
 - **2026-06-09 — GitHub remote connected; bus online.** `origin` →
   `https://github.com/forfuturegoods-lang/sontra-records.git`, `main` pushed.
   `claude-remote` can now join by opening this repo. Note: commits so far are
