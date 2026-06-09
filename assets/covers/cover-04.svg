@@ -1,0 +1,11 @@
+<!-- Placeholder album art. Swap for a real 1:1 image (jpg/png/webp) when available. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Placeholder cover art">
+  <rect width="600" height="600" fill="#0b0f0d"/>
+  <g stroke="#2f4a3c" stroke-width="2" fill="none">
+    <polygon points="300,90 480,300 300,510 120,300"/>
+    <polygon points="300,160 420,300 300,440 180,300"/>
+    <polygon points="300,230 360,300 300,370 240,300" stroke="#6fae8c"/>
+  </g>
+  <circle cx="300" cy="300" r="4" fill="#9fe0bf"/>
+  <text x="40" y="560" fill="#3f5a4c" font-family="monospace" font-size="22" letter-spacing="4">SR-009</text>
+</svg>

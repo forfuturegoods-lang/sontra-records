@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Sontra Records</title>
+  <meta name="description" content="The story behind Sontra Records — an independent electronic music label built for artists and listeners, not algorithms." />
+
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="nav">
+    <nav class="nav__inner" aria-label="Primary">
+      <a class="nav__logo" href="index.html">
+        <img src="assets/logo.svg" alt="" width="22" height="22" />
+        <span>Sontra<span class="dot"></span>Records</span>
+      </a>
+
+      <button class="nav__toggle" aria-label="Toggle menu" aria-controls="nav-links" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav__links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="releases.html">Releases</a></li>
+        <li><a href="about.html" class="is-active">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================================================================
+         EDITORIAL  — replace this placeholder copy with your real manifesto
+         =================================================================== -->
+    <section class="section">
+      <div class="container">
+        <article class="editorial">
+          <span class="eyebrow">The Label</span>
+          <h1>We press<br />music that<br />refuses to<br />blend in.</h1>
+
+          <p class="lead">
+            Sontra Records is an independent electronic label working at the edge
+            of club music and the experimental fringe. We exist for the records
+            that don't fit a playlist slot — the ones built for a dark room, a
+            big system, and people who actually listen.
+          </p>
+
+          <p>
+            We started the way most good things start: a handful of friends,
+            a shared hard drive of unreleased tracks, and the conviction that
+            the music deserved a home that wasn't optimized for retention metrics.
+            No A&amp;R committees. No focus groups. Just artists we believe in and
+            a commitment to release their work with care.
+          </p>
+
+          <p>
+            Every release is mastered for the floor and the headphones alike, sold
+            directly through Bandcamp so the people who make the music keep the
+            larger share of what you pay. We don't chase virality. We chase records
+            that still sound right in ten years.
+          </p>
+
+          <!-- A few label "stats". Edit the numbers to taste. -->
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__num" data-release-count>0</div>
+              <div class="stat__label">Releases</div>
+            </div>
+            <div class="stat">
+              <div class="stat__num">9</div>
+              <div class="stat__label">Artists</div>
+            </div>
+            <div class="stat">
+              <div class="stat__num">100%</div>
+              <div class="stat__label">Independent</div>
+            </div>
+          </div>
+
+          <p class="muted">
+            We're always listening. If you make music that belongs here, reach us
+            through Bandcamp or the mailing list — we read everything that comes in.
+          </p>
+
+          <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap">
+            <a class="btn btn--solid"  href="releases.html">Hear the catalog</a>
+            <a class="btn btn--outline" href="index.html#subscribe">Join the mailing list</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="name">Sontra Records</div>
+          <p>An independent electronic music label. Releases pressed for the floor and the headphones alike.</p>
+        </div>
+        <div class="footer__col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="releases.html">Releases</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="index.html#subscribe">Subscribe</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Listen &amp; Support</h4>
+          <ul>
+            <li><a href="https://sontrarecords.bandcamp.com" target="_blank" rel="noopener">Bandcamp</a></li>
+            <li><a href="https://soundcloud.com" target="_blank" rel="noopener">SoundCloud</a></li>
+            <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© <span id="copyright-year">2024–2026</span> Sontra Records</span>
+        <span>All rights reserved</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

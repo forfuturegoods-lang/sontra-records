@@ -1,0 +1,11 @@
+<!-- Placeholder album art. Swap for a real 1:1 image (jpg/png/webp) when available. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Placeholder cover art">
+  <rect width="600" height="600" fill="#100d14"/>
+  <g fill="none" stroke="#4a3f5c" stroke-width="2">
+    <circle cx="200" cy="240" r="150"/>
+    <circle cx="380" cy="340" r="150"/>
+    <circle cx="300" cy="300" r="210" stroke="#7a6a99"/>
+  </g>
+  <rect x="0" y="295" width="600" height="10" fill="#0a0a0a"/>
+  <text x="40" y="560" fill="#5a4f6c" font-family="monospace" font-size="22" letter-spacing="4">SR-007</text>
+</svg>

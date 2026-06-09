@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sontra Records — Independent. Electronic. Uncompromising.</title>
+  <meta name="description" content="Sontra Records — an independent electronic music label. Latest releases, full catalog, and donations via Bandcamp." />
+
+  <!-- Open Graph (social sharing) -->
+  <meta property="og:title" content="Sontra Records" />
+  <meta property="og:description" content="Independent. Electronic. Uncompromising." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+
+  <!-- JetBrains Mono — technical monospaced typeface -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- =====================================================================
+       NAVBAR  (identical on every page — keep in sync if you edit it)
+       ===================================================================== -->
+  <header class="nav">
+    <nav class="nav__inner" aria-label="Primary">
+      <a class="nav__logo" href="index.html">
+        <img src="assets/logo.svg" alt="" width="22" height="22" />
+        <span>Sontra<span class="dot"></span>Records</span>
+      </a>
+
+      <button class="nav__toggle" aria-label="Toggle menu" aria-controls="nav-links" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav__links" id="nav-links">
+        <li><a href="index.html" class="is-active">Home</a></li>
+        <li><a href="releases.html">Releases</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================================================================
+         HERO
+         =================================================================== -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <h1 class="hero__logotype">Sontra<br /><span class="accent">Records</span></h1>
+        <p class="hero__tagline">Independent. Electronic. Uncompromising.</p>
+        <div class="hero__status">
+          <span class="pulse"></span>
+          <span><span data-release-count>0</span> releases in catalog</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         LATEST RELEASES  (auto-filled with the 3 newest — see script.js)
+         =================================================================== -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>Latest Releases</h2>
+          <span class="count">Newest first</span>
+        </div>
+        <!-- Cards injected here by script.js → renderInto("latest-grid", ...) -->
+        <div class="grid" id="latest-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         ALL RELEASES  (back catalog — everything after the newest 3)
+         =================================================================== -->
+    <section class="section section--tight">
+      <div class="container">
+        <div class="section-head">
+          <h2>All Releases</h2>
+          <a class="count" href="releases.html">View full catalog →</a>
+        </div>
+        <!-- Cards injected here by script.js → renderInto("all-grid", ...) -->
+        <div class="grid" id="all-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         SUBSCRIBE
+         =================================================================== -->
+    <section class="section" id="subscribe">
+      <div class="container">
+        <div class="subscribe">
+          <span class="eyebrow">Mailing list</span>
+          <h2 style="margin-top:14px">Get notified about new releases</h2>
+          <p>No spam. Just a heads-up when we press something new. Unsubscribe anytime.</p>
+
+          <!-- ===========================================================
+               SUBSCRIBE FORM
+               To go live, replace the action below with your provider:
+                 • Formspree:  action="https://formspree.io/f/YOUR_FORM_ID"
+                 • Mailchimp:  paste your embedded form markup instead
+               Until then, the form shows a friendly placeholder message.
+               =========================================================== -->
+          <form class="subscribe__form"
+                action="https://formspree.io/f/YOUR_FORM_ID"
+                method="POST">
+            <input class="subscribe__input"
+                   type="email" name="email"
+                   placeholder="you@email.com"
+                   aria-label="Email address" required />
+            <button class="btn btn--solid" type="submit">Subscribe</button>
+          </form>
+
+          <p class="form-msg" role="status" aria-live="polite"></p>
+          <p class="subscribe__note">Powered by Bandcamp · Built for the underground</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       FOOTER  (identical on every page)
+       ===================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="name">Sontra Records</div>
+          <p>An independent electronic music label. Releases pressed for the floor and the headphones alike.</p>
+        </div>
+
+        <div class="footer__col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="releases.html">Releases</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="index.html#subscribe">Subscribe</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__col">
+          <h4>Listen &amp; Support</h4>
+          <ul>
+            <!-- REPLACE with your real Bandcamp + social URLs -->
+            <li><a href="https://sontrarecords.bandcamp.com" target="_blank" rel="noopener">Bandcamp</a></li>
+            <li><a href="https://soundcloud.com" target="_blank" rel="noopener">SoundCloud</a></li>
+            <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <span>© <span id="copyright-year">2024–2026</span> Sontra Records</span>
+        <span>All rights reserved</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

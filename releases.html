@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Releases — Sontra Records</title>
+  <meta name="description" content="The full Sontra Records catalog — every release, newest first. Filter by year or genre. Stream, buy, and donate via Bandcamp." />
+
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="nav">
+    <nav class="nav__inner" aria-label="Primary">
+      <a class="nav__logo" href="index.html">
+        <img src="assets/logo.svg" alt="" width="22" height="22" />
+        <span>Sontra<span class="dot"></span>Records</span>
+      </a>
+
+      <button class="nav__toggle" aria-label="Toggle menu" aria-controls="nav-links" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav__links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="releases.html" class="is-active">Releases</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- PAGE HEADER -->
+    <section class="section section--tight" style="border-bottom:1px solid var(--border)">
+      <div class="container">
+        <span class="eyebrow">Catalog</span>
+        <h1 style="font-size:clamp(28px,6vw,48px);letter-spacing:0.04em;margin-top:14px">Releases</h1>
+        <p style="color:var(--text-dim);margin-top:12px;max-width:560px;letter-spacing:0.04em">
+          The complete catalog, newest first. Filter by year or genre — everything
+          streams, buys, and donates through Bandcamp.
+        </p>
+      </div>
+    </section>
+
+    <!-- CATALOG + FILTERS -->
+    <section class="section">
+      <div class="container">
+
+        <!-- FILTER BAR — toggle buttons are generated from the data in script.js -->
+        <div class="filters">
+          <div class="filters__group">
+            <span class="filters__label">Year</span>
+            <div class="filters__group" id="filter-years"></div>
+          </div>
+          <span class="filters__sep" aria-hidden="true"></span>
+          <div class="filters__group">
+            <span class="filters__label">Genre</span>
+            <div class="filters__group" id="filter-genres"></div>
+          </div>
+        </div>
+
+        <!-- Cards injected here by script.js → renderInto("releases-grid", ...) -->
+        <div class="grid" id="releases-grid"></div>
+
+        <!-- shown only when filters match nothing -->
+        <p class="empty-state" id="releases-empty">No releases match those filters.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="name">Sontra Records</div>
+          <p>An independent electronic music label. Releases pressed for the floor and the headphones alike.</p>
+        </div>
+        <div class="footer__col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="releases.html">Releases</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="index.html#subscribe">Subscribe</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Listen &amp; Support</h4>
+          <ul>
+            <li><a href="https://sontrarecords.bandcamp.com" target="_blank" rel="noopener">Bandcamp</a></li>
+            <li><a href="https://soundcloud.com" target="_blank" rel="noopener">SoundCloud</a></li>
+            <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© <span id="copyright-year">2024–2026</span> Sontra Records</span>
+        <span>All rights reserved</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

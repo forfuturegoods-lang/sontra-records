@@ -1,0 +1,805 @@
+/* ============================================================================
+   SONTRA RECORDS — Design System
+   Dark, precise, minimal. Inspired by professional DJ software
+   (Traktor DJ Pro / Rekordbox).
+
+   This file is organized top-to-bottom:
+     1.  Design tokens (CSS variables) ........ edit colors/spacing here
+     2.  Reset & base
+     3.  Typography
+     4.  Layout helpers
+     5.  Navbar
+     6.  Buttons & toggles
+     7.  Hero
+     8.  Section headers
+     9.  Release grid & cards
+     10. Bandcamp embed treatment
+     11. Filter bar
+     12. Subscribe form
+     13. About page
+     14. Footer
+     15. Responsive breakpoints
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ */
+/* 1. DESIGN TOKENS — change brand colors & spacing in one place      */
+/* ------------------------------------------------------------------ */
+:root {
+  /* Backgrounds */
+  --bg:            #0a0a0a;   /* near-black page background          */
+  --surface:       #141414;   /* dark panels (navbar, footer)        */
+  --surface-2:     #1a1a1a;   /* alternate panel                     */
+  --card:          #222222;   /* card background                     */
+  --card-2:        #2a2a2a;   /* raised / hover card                 */
+
+  /* Lines */
+  --border:        #333333;   /* borders & dividers                  */
+  --border-strong: #4a4a4a;   /* emphasized border                   */
+
+  /* Text */
+  --text:          #e0e0e0;   /* primary text                        */
+  --text-dim:      #888888;   /* secondary / muted text              */
+
+  /* Controls */
+  --btn:           #d0d0d0;   /* button base fill                    */
+  --btn-hover:     #ffffff;   /* button hover fill                   */
+  --accent:        #c8c8c8;   /* subtle highlight                    */
+  --glow:          rgba(200, 200, 200, 0.12); /* faint glow          */
+
+  /* Radii & spacing */
+  --radius:        3px;        /* rectangular, slightly rounded       */
+  --radius-lg:     4px;
+  --gap:           20px;
+  --maxw:          1200px;
+
+  /* Type */
+  --font: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'SF Mono',
+          Menlo, Consolas, monospace;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. RESET & BASE                                                     */
+/* ------------------------------------------------------------------ */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+* { margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-weight: 300;
+  line-height: 1.6;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* subtle vertical structure, like a software panel */
+  background-image:
+    radial-gradient(circle at 50% -20%, rgba(255,255,255,0.03), transparent 45%);
+  min-height: 100vh;
+}
+
+img { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+::selection { background: var(--accent); color: #0a0a0a; }
+
+/* Thin, technical scrollbar to match the DJ-software feel */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+/* ------------------------------------------------------------------ */
+/* 3. TYPOGRAPHY                                                       */
+/* ------------------------------------------------------------------ */
+h1, h2, h3, h4 {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. LAYOUT HELPERS                                                   */
+/* ------------------------------------------------------------------ */
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section { padding: 72px 0; }
+.section--tight { padding: 48px 0; }
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  border: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. NAVBAR — sticky, dark, logo left, links right                   */
+/* ------------------------------------------------------------------ */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 15px;
+}
+
+.nav__logo .dot {
+  width: 9px;
+  height: 9px;
+  background: var(--btn-hover);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--glow);
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+}
+
+.nav__links a {
+  display: inline-block;
+  padding: 8px 14px;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease),
+              background 0.15s var(--ease);
+}
+
+.nav__links a:hover { color: var(--text); border-color: var(--border); }
+
+.nav__links a.is-active {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+
+/* Hamburger — hidden on desktop */
+.nav__toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.nav__toggle span {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  margin: 0 auto;
+  background: var(--text);
+  transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+
+/* Hamburger -> X when open */
+.nav__toggle.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav__toggle.is-open span:nth-child(2) { opacity: 0; }
+.nav__toggle.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* ------------------------------------------------------------------ */
+/* 6. BUTTONS & TOGGLES                                                */
+/* ------------------------------------------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease),
+              border-color 0.15s var(--ease), box-shadow 0.15s var(--ease),
+              transform 0.05s var(--ease);
+  white-space: nowrap;
+}
+
+.btn:active { transform: translateY(1px); }
+
+/* Solid (Buy): white/bright-grey fill, dark text */
+.btn--solid {
+  background: var(--btn);
+  color: #0a0a0a;
+}
+.btn--solid:hover {
+  background: var(--btn-hover);
+  box-shadow: 0 0 14px var(--glow);
+}
+
+/* Outline (Donate): transparent bg, white border */
+.btn--outline {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.btn--outline:hover {
+  border-color: var(--btn-hover);
+  color: var(--btn-hover);
+}
+
+.btn--block { width: 100%; }
+
+/* Pill toggle (filter buttons) */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 16px;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;          /* pill-shaped */
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
+}
+
+.toggle:hover { color: var(--text); border-color: var(--border-strong); }
+
+/* Active toggle: white fill, dark text */
+.toggle.is-active {
+  background: var(--btn-hover);
+  color: #0a0a0a;
+  border-color: var(--btn-hover);
+}
+
+/* ------------------------------------------------------------------ */
+/* 7. HERO                                                             */
+/* ------------------------------------------------------------------ */
+.hero {
+  position: relative;
+  padding: 96px 0 72px;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* faint technical grid in the background of the hero */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.15;
+  -webkit-mask-image: radial-gradient(circle at 30% 40%, #000, transparent 70%);
+          mask-image: radial-gradient(circle at 30% 40%, #000, transparent 70%);
+  pointer-events: none;
+}
+
+.hero__inner { position: relative; }
+
+.hero__logotype {
+  font-size: clamp(40px, 10vw, 104px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.hero__logotype .accent { color: var(--text-dim); }
+
+.hero__tagline {
+  margin-top: 22px;
+  max-width: 620px;
+  font-size: clamp(13px, 2.2vw, 16px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.hero__status {
+  margin-top: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.hero__status .pulse {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #9fe09f;                     /* faint green "live" glow */
+  box-shadow: 0 0 8px rgba(159, 224, 159, 0.6);
+  animation: pulse 2s infinite var(--ease);
+}
+
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ------------------------------------------------------------------ */
+/* 8. SECTION HEADERS                                                  */
+/* ------------------------------------------------------------------ */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-head h2 { font-size: clamp(18px, 3vw, 26px); }
+
+.section-head .count {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+}
+
+/* ------------------------------------------------------------------ */
+/* 9. RELEASE GRID & CARDS                                             */
+/* ------------------------------------------------------------------ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);   /* 3 columns desktop */
+  gap: var(--gap);
+}
+
+.release-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 0.18s var(--ease), transform 0.18s var(--ease),
+              box-shadow 0.18s var(--ease);
+}
+
+.release-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Album art */
+.release-card__art {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.release-card__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Catalog number chip over the art */
+.release-card__catalog {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  padding: 4px 8px;
+  background: rgba(10, 10, 10, 0.78);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+}
+
+.release-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  flex: 1;
+}
+
+.release-card__title {
+  font-size: 15px;
+  letter-spacing: 0.06em;
+}
+
+.release-card__artist {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.release-card__sub {
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.release-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* 10. BANDCAMP EMBED — responsive, dark panel treatment              */
+/* ------------------------------------------------------------------ */
+.bandcamp {
+  background: #111111;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  /* large player default height; small player can override inline */
+}
+
+.bandcamp iframe {
+  display: block;
+  width: 100%;
+  height: 340px;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* 11. FILTER BAR (releases page)                                     */
+/* ------------------------------------------------------------------ */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.filters__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.filters__label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-right: 4px;
+}
+
+.filters__sep {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border);
+  margin: 2px 8px;
+}
+
+/* hidden card when filtered out */
+.release-card.is-hidden { display: none; }
+
+.empty-state {
+  display: none;
+  padding: 48px 0;
+  text-align: center;
+  color: var(--text-dim);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 12. SUBSCRIBE FORM                                                  */
+/* ------------------------------------------------------------------ */
+.subscribe {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 48px 32px;
+  text-align: center;
+}
+
+.subscribe h2 { font-size: clamp(18px, 3vw, 26px); }
+
+.subscribe p {
+  margin: 14px auto 28px;
+  max-width: 520px;
+  color: var(--text-dim);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.subscribe__form {
+  display: flex;
+  gap: 10px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.subscribe__input {
+  flex: 1;
+  padding: 12px 16px;
+  font-family: var(--font);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.subscribe__input::placeholder { color: var(--text-dim); }
+
+.subscribe__input:focus {
+  border-color: var(--btn-hover);
+  box-shadow: 0 0 0 1px var(--btn-hover), 0 0 14px var(--glow);
+}
+
+.subscribe__note {
+  margin-top: 16px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* success/error message shown after submit */
+.form-msg {
+  margin-top: 18px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  min-height: 1em;
+}
+.form-msg.is-ok    { color: #9fe09f; }
+.form-msg.is-error { color: #e0a0a0; }
+
+/* ------------------------------------------------------------------ */
+/* 13. ABOUT PAGE                                                      */
+/* ------------------------------------------------------------------ */
+.editorial {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.editorial .eyebrow { margin-bottom: 18px; }
+
+.editorial h1 {
+  font-size: clamp(28px, 6vw, 52px);
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  margin-bottom: 32px;
+}
+
+.editorial p {
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.85;
+  margin-bottom: 22px;
+}
+
+.editorial p.lead {
+  color: var(--text);
+  font-size: 19px;
+  line-height: 1.7;
+}
+
+.editorial .muted { color: var(--text-dim); }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+  margin: 48px 0;
+}
+
+.stat {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  background: var(--card);
+}
+
+.stat__num {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.stat__label {
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ------------------------------------------------------------------ */
+/* 14. FOOTER                                                          */
+/* ------------------------------------------------------------------ */
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 56px 0 32px;
+  margin-top: 24px;
+}
+
+.footer__grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer__brand .name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.footer__brand p {
+  margin-top: 14px;
+  max-width: 320px;
+  color: var(--text-dim);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.footer__col h4 {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+.footer__col ul { list-style: none; display: grid; gap: 10px; }
+
+.footer__col a {
+  font-size: 13px;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  transition: color 0.15s var(--ease);
+}
+.footer__col a:hover { color: var(--btn-hover); }
+
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ------------------------------------------------------------------ */
+/* 15. RESPONSIVE                                                      */
+/* ------------------------------------------------------------------ */
+
+/* Tablet: 2-column grid */
+@media (max-width: 960px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .footer__grid { grid-template-columns: 1fr 1fr; }
+  .footer__brand { grid-column: 1 / -1; }
+}
+
+/* Mobile: hamburger nav + single column */
+@media (max-width: 680px) {
+  .section { padding: 52px 0; }
+
+  /* show hamburger, hide inline links */
+  .nav__toggle { display: flex; }
+
+  .nav__links {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 12px 16px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    /* collapsed by default */
+    transform: translateY(-12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.2s var(--ease), opacity 0.2s var(--ease),
+                visibility 0.2s var(--ease);
+  }
+
+  .nav__links.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav__links a { padding: 12px 14px; }
+
+  .grid { grid-template-columns: 1fr; }   /* 1 column mobile */
+
+  .stats { grid-template-columns: 1fr; }
+
+  .subscribe__form { flex-direction: column; }
+
+  .subscribe { padding: 36px 20px; }
+
+  .footer__grid { grid-template-columns: 1fr; }
+
+  .footer__bottom { flex-direction: column; align-items: flex-start; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; scroll-behavior: auto !important; }
+}

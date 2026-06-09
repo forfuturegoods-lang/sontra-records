@@ -1,0 +1,12 @@
+<!-- Placeholder album art. Swap for a real 1:1 image (jpg/png/webp) when available. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Placeholder cover art">
+  <rect width="600" height="600" fill="#0a0a0a"/>
+  <g stroke="#333333" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="0" y1="500" x2="600" y2="500"/>
+  </g>
+  <polyline points="0,300 60,300 90,180 150,420 210,260 270,340 300,80 330,520 390,300 450,240 510,360 600,300"
+            fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linejoin="round"/>
+  <text x="40" y="560" fill="#555555" font-family="monospace" font-size="22" letter-spacing="4">SR-008</text>
+</svg>
