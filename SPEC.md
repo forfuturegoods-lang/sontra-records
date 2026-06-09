@@ -4,8 +4,8 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.5.0
-- **Status:** Implemented (self-hosted audio player + beat grid; silent demo until enabled — see §11)
+- **Spec version:** 1.6.0
+- **Status:** Implemented (Web Audio player + beat grid; silent demo until enabled — see §11)
 - **Last updated:** 2026-06-09
 
 ---
@@ -60,7 +60,8 @@ cover (path), albumId (Bandcamp), buyUrl, donateUrl
   in `assets/audio/` named `<catalog>.mp3` (e.g. `sr-012.mp3`), or set an explicit
   `audio:` path per release (any browser format: mp3/m4a/ogg/wav). With audio off
   it runs as a silent visual demo. `customPlayer()` builds it; `setupPlayer()`
-  wires playback. **Beat grid (Ableton-style):** each release has a `bpm`; the
+  wires playback via the **Web Audio API** (decode-once buffer playback —
+  sample-accurate, gapless). **Beat grid (Ableton-style):** each release has a `bpm`; the
   player draws a tempo grid on the waveform and seeking **snaps to it** (snap
   control cycles bar / beat / off) so jumps land in time. *Optional:* Bandcamp
   embeds remain available via
@@ -163,8 +164,17 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   step one grid unit. Works in the silent demo and on real audio (snaps
   `audio.currentTime`). `bpm` is per-release (`DEFAULT_BPM` otherwise) with an
   optional `beatOffset` for the first downbeat; Blue Friday's `bpm` (124) is a
-  placeholder pending the real value. _(Studio-grade gapless re-trigger would be
-  a Web Audio upgrade.)_ Shown via CSS
+  placeholder pending the real value.
+- **2026-06-09 — Web Audio engine (gapless quantized seeking).** Real playback
+  now uses the Web Audio API: each track is fetched + `decodeAudioData`'d once
+  (cached) and played via an `AudioBufferSourceNode`; position comes from the
+  AudioContext clock. A quantized seek stops the source and restarts it at the
+  snapped offset — sample-accurate and click-free, so jumps are gapless and stay
+  on the grid. Falls back to the silent demo if a file is missing/unsupported;
+  shows a brief `is-loading` state while decoding. Replaces the HTML5 `<audio>`
+  path (the player now reads a `data-audio` URL). Note: decoding loads the whole
+  file into memory — keep web previews reasonably short. _(Not yet runtime-tested
+  with a real file — verify once audio is added.)_ Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in

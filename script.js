@@ -181,14 +181,12 @@ function customPlayer(r) {
   const bpm        = r.bpm || DEFAULT_BPM;
   const beatOffset = r.beatOffset || 0;
 
-  // Real audio element — only rendered when self-hosted audio is enabled.
-  const audioEl = AUDIO_ENABLED
-    ? `<audio preload="metadata" src="${esc(audioUrlFor(r))}"></audio>` : "";
+  // Web Audio fetches + decodes this URL for gapless playback (when audio is on).
+  const audioAttr = AUDIO_ENABLED ? `data-audio="${esc(audioUrlFor(r))}"` : "";
 
   return `
-      <div class="player" data-player data-bpm="${esc(bpm)}" data-beat-offset="${esc(beatOffset)}"
+      <div class="player" data-player ${audioAttr} data-bpm="${esc(bpm)}" data-beat-offset="${esc(beatOffset)}"
            aria-label="Player for ${esc(r.title)} by ${esc(r.artist)}">
-        ${audioEl}
         <div class="player__bar">
           <button class="player__btn" type="button" data-play aria-label="Play / pause">
             <span class="player__icon-play" aria-hidden="true">▶</span>
@@ -431,6 +429,28 @@ function showMsg(el, ok, text) {
    ────────────────────────────────────────────────────────────────────────── */
 let _activePlayer = null;
 
+/* Shared Web Audio context (created on first user gesture) + a decode cache so
+   each track is fetched/decoded once. Powers gapless, sample-accurate playback. */
+let _audioCtx = null;
+function audioCtx() {
+  if (!_audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) _audioCtx = new AC();
+  }
+  return _audioCtx;
+}
+const _bufferCache = new Map();
+function loadBuffer(url) {
+  if (_bufferCache.has(url)) return _bufferCache.get(url);
+  const ctx = audioCtx();
+  const p = !ctx ? Promise.resolve(null) : fetch(url)
+    .then(res => { if (!res.ok) throw new Error("audio " + res.status); return res.arrayBuffer(); })
+    .then(buf => ctx.decodeAudioData(buf))
+    .catch(() => null);                 // missing / unsupported → null → silent demo
+  _bufferCache.set(url, p);
+  return p;
+}
+
 function initPlayers() {
   document.querySelectorAll("[data-player]").forEach(setupPlayer);
 }
@@ -443,32 +463,39 @@ function setupPlayer(player) {
   const grid      = player.querySelector("[data-grid]");
   const snapBtn   = player.querySelector("[data-snap]");
   const snapLabel = player.querySelector("[data-snap-label]");
-  const audio     = player.querySelector("audio");   // present only when AUDIO_ENABLED
   if (!btn || !scrub || !fg) return;
 
-  // tempo / beat grid
+  const audioUrl   = player.dataset.audio || "";    // set only when AUDIO_ENABLED
   const bpm        = parseFloat(player.dataset.bpm) || DEFAULT_BPM;
   const beatOffset = parseFloat(player.dataset.beatOffset) || 0;
   const beatDur    = 60 / bpm;
   const barDur     = beatDur * BEATS_PER_BAR;
-  let   snap       = "bar";         // bar | beat | off  (Ableton-style quantize)
+  let   snap       = "bar";          // bar | beat | off  (Ableton-style quantize)
 
-  const DEMO_DURATION = 32;         // seconds, used only for the silent demo
-  let pct = 0, playing = false, raf = null, last = 0;
+  const DEMO_DURATION = 32;          // silent-demo length when there's no audio file
+
+  // ── engine state ──
+  let buffer = null, source = null;  // decoded AudioBuffer + current source node
+  let loadTried = false, loading = false;
+  let playing = false;
+  let startedAt = 0, offsetAt = 0;   // ctx-time the source started + its buffer offset
+  let head = 0;                      // position (sec) while paused / for the demo ramp
+  let pct = 0, raf = null, last = 0;
 
   const fmt = sec => {
     const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
     return m + ":" + String(s).padStart(2, "0");
   };
-  // total seconds: real audio duration when known, else the demo length
-  const total = () =>
-    (audio && audio.duration && isFinite(audio.duration)) ? audio.duration : DEMO_DURATION;
+  const total = () => buffer ? buffer.duration : DEMO_DURATION;
+  // live playback position in seconds
+  function position() {
+    if (buffer && playing) return Math.min(buffer.duration, offsetAt + (audioCtx().currentTime - startedAt));
+    return head;
+  }
 
-  // size the visual grid (bar + beat line spacing) to tempo + duration
   function updateGrid() {
     if (!grid) return;
-    const t = total();
-    if (!t) return;
+    const t = total(); if (!t) return;
     grid.style.setProperty("--beat-pct", (beatDur / t * 100) + "%");
     grid.style.setProperty("--bar-pct",  (barDur  / t * 100) + "%");
   }
@@ -479,55 +506,93 @@ function setupPlayer(player) {
     const q = beatOffset + Math.round((sec - beatOffset) / unit) * unit;
     return Math.max(0, Math.min(total(), q));
   }
-
   function render() {
+    pct = total() ? Math.max(0, Math.min(100, position() / total() * 100)) : 0;
     fg.style.clipPath = "inset(0 " + (100 - pct) + "% 0 0)";   // reveal played bars
     scrub.setAttribute("aria-valuenow", Math.round(pct));
     if (timeEl) timeEl.textContent = fmt(total() * pct / 100);
   }
-  function stop() {
-    playing = false;
-    player.classList.remove("is-playing");
-    if (audio) audio.pause();
-    if (raf) cancelAnimationFrame(raf);
-    raf = null; last = 0;
-    if (_activePlayer === api) _activePlayer = null;
+
+  // ── Web Audio source control (start/stop are sample-accurate → gapless) ──
+  function startSource(offset) {
+    const ctx = audioCtx();
+    source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.onended = onNaturalEnd;
+    offsetAt  = Math.max(0, Math.min(buffer.duration, offset));
+    startedAt = ctx.currentTime;
+    source.start(0, offsetAt);
   }
-  // per-frame progress: from the audio element if real, else a timed ramp
+  function stopSource() {
+    if (!source) return;
+    source.onended = null;             // don't fire end-handler on a manual stop/seek
+    try { source.stop(); } catch (e) {}
+    source.disconnect();
+    source = null;
+  }
+  function onNaturalEnd() {
+    stopSource();
+    playing = false; head = 0;
+    player.classList.remove("is-playing");
+    cancelRaf();
+    if (_activePlayer === api) _activePlayer = null;
+    render();
+  }
+
+  function cancelRaf() { if (raf) cancelAnimationFrame(raf); raf = null; last = 0; }
   function frame(now) {
-    if (audio) {
-      if (audio.duration) pct = (audio.currentTime / audio.duration) * 100;
-    } else {
+    if (!buffer) {                     // silent-demo ramp (no audio file)
       if (!last) last = now;
-      pct += ((now - last) / 1000 / DEMO_DURATION) * 100;
-      last = now;
-      if (pct >= 100) { pct = 100; render(); stop(); pct = 0; return; }
+      head += (now - last) / 1000; last = now;
+      if (head >= DEMO_DURATION) { head = 0; stop(); render(); return; }
     }
     render();
     raf = requestAnimationFrame(frame);
   }
-  function play() {
+
+  function stop() {                    // pause, keeping the current position
+    if (buffer) { head = position(); stopSource(); }
+    playing = false;
+    player.classList.remove("is-playing");
+    cancelRaf();
+    if (_activePlayer === api) _activePlayer = null;
+  }
+  async function play() {
+    if (loading) return;
     if (_activePlayer && _activePlayer !== api) _activePlayer.stop();  // one at a time
+
+    if (audioUrl && !buffer && !loadTried) {   // fetch + decode once, on first play
+      loading = true; loadTried = true;
+      player.classList.add("is-loading");
+      const ctx = audioCtx();
+      if (ctx && ctx.state === "suspended") { try { await ctx.resume(); } catch (e) {} }
+      buffer = await loadBuffer(audioUrl);     // null → graceful silent demo
+      player.classList.remove("is-loading");
+      loading = false;
+      updateGrid();
+    }
+
     playing = true; last = 0;
     _activePlayer = api;
     player.classList.add("is-playing");
-    if (audio) audio.play().catch(() => {});      // user-gesture, so allowed
+    if (buffer) {
+      const ctx = audioCtx();
+      if (ctx.state === "suspended") { try { await ctx.resume(); } catch (e) {} }
+      startSource(head >= buffer.duration ? 0 : head);
+    }
     raf = requestAnimationFrame(frame);
   }
   const api = { stop };
 
-  if (audio) {
-    audio.addEventListener("ended", () => { stop(); pct = 0; render(); });
-    audio.addEventListener("loadedmetadata", () => { updateGrid(); render(); });
-  }
-
   btn.addEventListener("click", () => { playing ? stop() : play(); });
 
-  // seek to a percentage, QUANTIZED to the beat grid — no stop, so it stays in time
+  // seek, QUANTIZED to the grid. In Web Audio mode the source restarts at the
+  // snapped offset — sample-accurate + gapless, so playback stays in time.
   function seekTo(p) {
     const sec = quantize((Math.max(0, Math.min(100, p)) / 100) * total());
-    pct = total() ? (sec / total()) * 100 : 0;
-    if (audio && audio.duration) audio.currentTime = sec;
+    head = sec;
+    if (buffer && playing) { stopSource(); startSource(sec); }
     render();
   }
   scrub.addEventListener("click", e => {
