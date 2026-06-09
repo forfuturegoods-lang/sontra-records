@@ -176,6 +176,16 @@ h1, h2, h3, h4 {
   box-shadow: 0 0 8px var(--glow);
 }
 
+/* Brand logo image. The source is a white-on-black JPEG (no transparency);
+   mix-blend-mode: screen makes the black background drop out against the dark
+   navbar, leaving only the white mark. Swap the file in assets/ to update. */
+.nav__logo-img {
+  height: 40px;
+  width: auto;
+  display: block;
+  mix-blend-mode: screen;
+}
+
 .nav__links {
   display: flex;
   align-items: center;

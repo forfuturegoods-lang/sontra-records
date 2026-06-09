@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.1.0
+- **Spec version:** 1.2.0
 - **Status:** Implemented (interface-first; player placeholder — see §11)
 - **Last updated:** 2026-06-09
 
@@ -99,7 +99,7 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   which makes `script.js` show a friendly confirmation instead of posting.
   Placeholder release titles/artists are kept. These placeholders are
   **intentional, not bugs.** To go live: supply the values, wire them in, and
-  bump the spec to `1.2.0`.
+  bump the spec to `1.3.0`.
 - **2026-06-09 — Interface-first: Bandcamp player placeholder.** Release cards
   render a styled disabled-player placeholder ("Player coming soon · streaming
   via sontra-bandcamp") instead of a live embed with fake IDs. Controlled by
@@ -115,3 +115,10 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   `forfuturegoods-lang`), rewrote all existing commits' author + committer to
   that identity, then force-pushed. Auth unchanged (stored token). The
   `Co-Authored-By: Claude` trailer is preserved on every commit.
+- **2026-06-09 — Brand logo added.** Sontra Records logo
+  (`assets/sontra-logo.jpg`, white-on-black) placed top-left in the navbar on all
+  pages + set as favicon; the redundant text wordmark was removed. Shown via CSS
+  `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
+  navbar (no transparency / image editing needed). A broken all-black earlier
+  upload (`sontra_logo.png`) was removed. To update the logo, replace the file in
+  `assets/`.
