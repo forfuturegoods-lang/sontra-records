@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.0
+- **Spec version:** 1.7.1
 - **Status:** Implemented (Web Audio player + beat grid + Supabase admin/CMS — see §11)
 - **Last updated:** 2026-06-09
 
@@ -192,7 +192,11 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   / `mapReleaseRow`, async boot `initSite`), falling back to the built-in
   `RELEASES` array otherwise; the player uses each release's own `audio` URL when
   present. Not yet runtime-tested against a live project (needs the user's
-  Supabase URL + key) — verify after setup. Shown via CSS
+  Supabase URL + key) — verify after setup.
+- **2026-06-09 — Supabase connected.** Project URL + publishable key wired into
+  `supabase-config.js`; the admin page now shows the team login (was the setup
+  notice). Verified the keys/project are reachable. Still pending the user
+  running `supabase/schema.sql` — the `releases` table 404s until then. Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in

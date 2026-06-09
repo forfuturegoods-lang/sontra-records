@@ -10,8 +10,8 @@
    catalog (script.js → RELEASES) and the admin page shows a setup notice.
    ========================================================================== */
 
-window.SUPABASE_URL      = "";   // e.g. "https://abcdefgh.supabase.co"
-window.SUPABASE_ANON_KEY = "";   // e.g. "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+window.SUPABASE_URL      = "https://oocuotdsijfmogleovum.supabase.co";
+window.SUPABASE_ANON_KEY = "sb_publishable_8w2KBXiIX6hxKu552MXFIg_0wmf74nn";  // publishable (public) key — safe to ship
 
 /* ---- helpers (don't edit below) ------------------------------------------ */
 window.supabaseReady = function () {
