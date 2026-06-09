@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.0.2
+- **Spec version:** 1.0.3
 - **Status:** Implemented (placeholder mode — see §11)
 - **Last updated:** 2026-06-09
 
@@ -101,4 +101,9 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   `https://github.com/forfuturegoods-lang/sontra-records.git`, `main` pushed.
   `claude-remote` can now join by opening this repo. Note: commits so far are
   authored `pansan4o@gmail.com`; repo owner is a different GitHub identity
-  (`forfuturegoods-lang`) — attribution fix pending if desired.
+  (`forfuturegoods-lang`) — attribution fixed (see next entry).
+- **2026-06-09 — Attribution fixed.** Set `git user.email` to the GitHub
+  no-reply `287163746+forfuturegoods-lang@users.noreply.github.com` (and name to
+  `forfuturegoods-lang`), rewrote all existing commits' author + committer to
+  that identity, then force-pushed. Auth unchanged (stored token). The
+  `Co-Authored-By: Claude` trailer is preserved on every commit.
