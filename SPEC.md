@@ -4,8 +4,8 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.1
-- **Status:** Implemented (Web Audio player + beat grid + Supabase admin/CMS — see §11)
+- **Spec version:** 1.7.2
+- **Status:** Live (Supabase backend verified: schema run, RLS enforced — see §11)
 - **Last updated:** 2026-06-09
 
 ---
@@ -196,7 +196,11 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
 - **2026-06-09 — Supabase connected.** Project URL + publishable key wired into
   `supabase-config.js`; the admin page now shows the team login (was the setup
   notice). Verified the keys/project are reachable. Still pending the user
-  running `supabase/schema.sql` — the `releases` table 404s until then. Shown via CSS
+  running `supabase/schema.sql` — the `releases` table 404s until then.
+- **2026-06-09 — Supabase backend verified live.** Schema run. Confirmed via the
+  REST API with the publishable key: public read of `releases` returns `[]`
+  (HTTP 200); an unauthenticated insert is rejected by RLS (HTTP 401). Backend is
+  ready; next is adding the first release through `admin.html` (team login). Shown via CSS
   `mix-blend-mode: screen` so the JPEG's black background drops out on the dark
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in

@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-09",
-      "focus": "Supabase connected (URL + publishable key in supabase-config.js; admin shows login). Pending: user runs supabase/schema.sql (releases table 404 until then), then add first release.",
-      "spec_version": "1.7.1"
+      "focus": "Supabase backend LIVE + verified: schema run, public read returns [] (200), anon write blocked by RLS (401). Next: log into /admin.html and add the first release.",
+      "spec_version": "1.7.2"
     },
     "claude-remote": {
       "last_sync": null,
