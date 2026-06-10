@@ -650,6 +650,21 @@ h1, h2, h3, h4 {
 }
 .player.snap-off .player__grid { opacity: 0.22; }   /* grid still visible, snap disabled */
 
+/* Launch-quantize cue: blinks at the queued seek target until the jump lands
+   on the next grid boundary (Ableton-style). Positioned by JS via `left`. */
+.player__cue {
+  position: absolute;
+  top: -4px; bottom: -4px;
+  width: 2px; left: 0;
+  margin-left: -1px;
+  background: var(--btn-hover);
+  box-shadow: 0 0 6px var(--glow);
+  opacity: 0;
+  pointer-events: none;
+}
+.player.is-queued .player__cue { animation: cue-blink 0.3s steps(2, start) infinite; }
+@keyframes cue-blink { 0% { opacity: 1; } 100% { opacity: 0.2; } }
+
 /* Beat-grid snap control — appears while playing. */
 .player__snap {
   display: none;

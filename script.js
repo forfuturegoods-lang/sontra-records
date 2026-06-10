@@ -213,6 +213,7 @@ function customPlayer(r) {
             <div class="player__bars" aria-hidden="true">${bars(big)}</div>
             <div class="player__bars player__bars--fg" data-fg aria-hidden="true">${bars(big)}</div>
             <div class="player__grid" data-grid aria-hidden="true"></div>
+            <div class="player__cue" data-cue aria-hidden="true"></div>
           </div>
         </div>
       </div>`;
@@ -464,6 +465,7 @@ function setupPlayer(player) {
   const fg        = player.querySelector("[data-fg]");
   const timeEl    = player.querySelector("[data-time]");
   const grid      = player.querySelector("[data-grid]");
+  const cue       = player.querySelector("[data-cue]");
   const snapBtn   = player.querySelector("[data-snap]");
   const snapLabel = player.querySelector("[data-snap-label]");
   if (!btn || !scrub || !fg) return;
@@ -479,6 +481,8 @@ function setupPlayer(player) {
 
   // ── engine state ──
   let buffer = null, source = null;  // decoded AudioBuffer + current source node
+  let gainNode = null;               // per-source gain (declick crossfade at splices)
+  let pending = null;                // queued launch-quantized jump {src, g, at, offset}
   let loadTried = false, loading = false;
   let playing = false;
   let startedAt = 0, offsetAt = 0;   // ctx-time the source started + its buffer offset
@@ -492,6 +496,7 @@ function setupPlayer(player) {
   const total = () => buffer ? buffer.duration : DEMO_DURATION;
   // live playback position in seconds
   function position() {
+    promote();                       // fold in a queued jump whose boundary has passed
     if (buffer && playing) return Math.min(buffer.duration, offsetAt + (audioCtx().currentTime - startedAt));
     return head;
   }
@@ -517,22 +522,49 @@ function setupPlayer(player) {
   }
 
   // ── Web Audio source control (start/stop are sample-accurate → gapless) ──
+  function newNode() {                 // source → its own gain (for splice crossfades)
+    const ctx = audioCtx();
+    const src = ctx.createBufferSource();
+    const g   = ctx.createGain();
+    src.buffer = buffer;
+    src.connect(g); g.connect(ctx.destination);
+    return { src, g };
+  }
   function startSource(offset) {
     const ctx = audioCtx();
-    source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(ctx.destination);
+    const n = newNode();
+    source = n.src; gainNode = n.g;
     source.onended = onNaturalEnd;
     offsetAt  = Math.max(0, Math.min(buffer.duration, offset));
     startedAt = ctx.currentTime;
     source.start(0, offsetAt);
   }
   function stopSource() {
+    clearPending();
     if (!source) return;
     source.onended = null;             // don't fire end-handler on a manual stop/seek
     try { source.stop(); } catch (e) {}
     source.disconnect();
-    source = null;
+    if (gainNode) gainNode.disconnect();
+    source = null; gainNode = null;
+  }
+  // a queued (not yet due) launch-quantized jump → discard it
+  function clearPending() {
+    if (!pending) return;
+    pending.src.onended = null;
+    try { pending.src.stop(); pending.src.disconnect(); pending.g.disconnect(); } catch (e) {}
+    pending = null;
+    player.classList.remove("is-queued");
+  }
+  // a queued jump whose boundary has passed → it IS the playing source now
+  function promote() {
+    if (!pending || audioCtx().currentTime < pending.at) return;
+    const old = gainNode;              // disconnect after its fade tail is done
+    if (old) setTimeout(() => { try { old.disconnect(); } catch (e) {} }, 60);
+    source = pending.src; gainNode = pending.g;
+    startedAt = pending.at; offsetAt = pending.offset;
+    pending = null;
+    player.classList.remove("is-queued");
   }
   function onNaturalEnd() {
     stopSource();
@@ -590,13 +622,46 @@ function setupPlayer(player) {
 
   btn.addEventListener("click", () => { playing ? stop() : play(); });
 
-  // seek, QUANTIZED to the grid. In Web Audio mode the source restarts at the
-  // snapped offset — sample-accurate + gapless, so playback stays in time.
+  // seek, QUANTIZED to the grid. While playing with snap on, the jump is
+  // LAUNCH-QUANTIZED (Ableton-style): queued, then spliced in sample-accurately
+  // ON the next grid boundary with a short crossfade — beat phase never breaks.
+  // Paused or snap-off seeks are immediate.
+  const DECLICK = 0.003;               // crossfade at the splice (seconds)
   function seekTo(p) {
     const sec = quantize((Math.max(0, Math.min(100, p)) / 100) * total());
+    if (buffer && playing && snap !== "off") { queueJump(sec); return; }
     head = sec;
     if (buffer && playing) { stopSource(); startSource(sec); }
     render();
+  }
+  function queueJump(target) {
+    const ctx = audioCtx();
+    promote();                          // a due splice first, so state is current
+    let at;
+    if (pending) {                      // re-aim: keep the already-scheduled boundary
+      at = pending.at;
+      pending.src.onended = null;
+      try { pending.src.stop(); pending.src.disconnect(); pending.g.disconnect(); } catch (e) {}
+      pending = null;
+    } else {
+      const unit = snap === "bar" ? barDur : beatDur;
+      const next = beatOffset + Math.ceil((position() - beatOffset) / unit) * unit;
+      at = startedAt + (next - offsetAt);
+      while (at < ctx.currentTime + 0.05) at += unit;   // leave scheduling headroom
+      // fade the playing source out across the splice, then stop it
+      gainNode.gain.setValueAtTime(1, at);
+      gainNode.gain.linearRampToValueAtTime(0, at + DECLICK);
+      source.onended = null;
+      try { source.stop(at + DECLICK + 0.005); } catch (e) {}
+    }
+    const n = newNode();
+    n.src.onended = onNaturalEnd;
+    n.g.gain.setValueAtTime(0, at);
+    n.g.gain.linearRampToValueAtTime(1, at + DECLICK);
+    n.src.start(at, Math.max(0, Math.min(buffer.duration, target)));
+    pending = { src: n.src, g: n.g, at, offset: target };
+    player.classList.add("is-queued");
+    if (cue) cue.style.left = (target / total() * 100) + "%";
   }
   scrub.addEventListener("click", e => {
     const r = scrub.getBoundingClientRect();

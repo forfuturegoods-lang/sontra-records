@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "STR001 complete: bpm=130, beat_offset=1.37s set (detected via spectral-flux analysis of the WAV master) — beat grid active. Open: genre/buy/donate URLs unset; verify grid feel on the site.",
-      "spec_version": "1.7.3"
+      "focus": "Launch-quantized seeking shipped (spec 1.7.4): seeks queue + splice ON the next grid boundary w/ 3ms crossfade (Ableton-style), blinking cue marker. Fixes mid-beat jump feel user reported. Needs user listen-test. Open: STR001 genre/buy/donate URLs.",
+      "spec_version": "1.7.4"
     },
     "claude-remote": {
       "last_sync": null,

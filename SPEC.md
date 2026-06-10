@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.3
+- **Spec version:** 1.7.4
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -65,7 +65,12 @@ cover (image), audio (file/URL), buyUrl, donateUrl
   wires playback via the **Web Audio API** (decode-once buffer playback —
   sample-accurate, gapless). **Beat grid (Ableton-style):** each release has a `bpm`; the
   player draws a tempo grid on the waveform and seeking **snaps to it** (snap
-  control cycles bar / beat / off) so jumps land in time. *Optional:* Bandcamp
+  control cycles bar / beat / off) so jumps land in time. Seeks while playing are
+  **launch-quantized** (Ableton-style): the jump is *queued* and executes
+  sample-accurately **on the next grid boundary** (a blinking cue marker shows
+  the queued target), with a ~3 ms equal-power crossfade at the splice so the
+  beat phase never breaks and there is no click. With snap off (or while paused)
+  seeks are immediate. *Optional:* Bandcamp
   embeds remain available via
   `BANDCAMP_ENABLED` + a real `albumId` (`bandcampSrc`, styled
   `bgcol=111111 / linkcol=ffffff`).
@@ -219,3 +224,20 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   50 MB limit + `afconvert` transcode line, form fields, edit/delete), with the
   Supabase-dashboard manual flow as an owner-only fallback. BPM/`beat_offset` for
   STR001 still unset — beat grid inactive until filled in.
+- **2026-06-10 — STR001 beat grid set (bpm 130, beat_offset 1.37 s).** Values
+  detected from the WAV master via spectral-flux onset analysis (autocorrelation
+  tempogram → 130.0 BPM unambiguous; strongest of the 4 beat positions → first
+  downbeat at 1.370 s). Written to the Supabase row via the team login. The bar
+  anchor is an energy estimate — if bar snaps feel one beat off, the other
+  candidates are 0.447 / 0.909 / 1.832 s.
+- **2026-06-10 — Launch-quantized seeking (Ableton/Traktor-feel fix).** Snapped
+  seeks previously executed *immediately*: the destination was on the grid but
+  the splice happened mid-beat, so jumps broke the groove ("jumps a bit").
+  Now, while playing with snap on, `seekTo` **queues** the jump: the new source
+  is scheduled to start exactly at the **next grid boundary** (AudioContext
+  clock, sample-accurate) at the quantized target, and the old source fades out
+  across ~3 ms at the splice (per-source GainNodes) — beat phase is continuous
+  and click-free, like Ableton's launch quantization. A `player__cue` marker
+  blinks at the queued target (`is-queued`) until the splice lands; re-clicking
+  before the boundary re-aims the same boundary. Snap-off and paused seeks stay
+  immediate.
