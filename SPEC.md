@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.8.3
+- **Spec version:** 1.8.4
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -346,3 +346,11 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   `onAuthStateChange(null)` → both the Admin link and Log out button hide again,
   and the user stays on the current page (no redirect). Styled to match the nav
   links with a red-tinted hover to signal the sign-out action.
+- **2026-06-10 — Drop the duplicate title from the player bar.** The player's
+  control bar repeated the track title + artist (`.player__meta`) that the card /
+  hero already shows prominently right above it (`feature__title` /
+  `release-card__title`). Removed the `.player__meta` block from `customPlayer()`;
+  the spacer that right-aligns the mini-waveform / snap / time moved from
+  `.player__meta` (`margin-right:auto`) to `.player__mini` (`margin-left:auto`),
+  so the bar is now `[play] … [mini][time]` (and `[play] … [snap][time]` while
+  playing). Title/artist remain in the player's `aria-label`, so no a11y loss.

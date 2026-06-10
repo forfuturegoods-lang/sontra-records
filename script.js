@@ -195,10 +195,6 @@ function customPlayer(r) {
             <span class="player__icon-play" aria-hidden="true">▶</span>
             <span class="player__icon-pause" aria-hidden="true">❚❚</span>
           </button>
-          <span class="player__meta">
-            <span class="player__title">${esc(r.title)}</span>
-            <span class="player__sub">${esc(r.artist)}</span>
-          </span>
           <span class="player__mini" aria-hidden="true">${bars(mini)}</span>
           <button class="player__snap" type="button" data-snap
                   title="Beat-grid snap (bar / beat / off)" aria-label="Beat-grid snap">
