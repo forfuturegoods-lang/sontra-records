@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.8.5
+- **Spec version:** 1.8.6
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -360,3 +360,9 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   "Email the label" CTA button alongside the existing CTAs. The "we're always
   listening" copy was reworded to invite demos by email. This is the team's
   inbox (chosen by the owner) — update the address in `about.html` if it changes.
+- **2026-06-10 — Contact email in the footer (every page).** Extended the same
+  `demos@sontrarecords.com` contact to the shared footer (index/releases/about)
+  so it appears site-wide, not just on About. Added a `.footer__contact` line
+  ("Demos & enquiries: …" mailto) inside `.footer__brand`, below the blurb — no
+  change to the footer grid. The address now lives in two places (about.html +
+  the footer on all three pages); keep them in sync if it changes.
