@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.9
+- **Spec version:** 1.7.10
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -292,3 +292,17 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   `pointerenter`/`touchstart`/`focusin`. Decode runs on the (suspended-ok)
   shared AudioContext; `play()` already awaits the same cached promise, so
   pressing play mid-preload just joins the in-flight load. No UI change.
+- **2026-06-10 — Beat-jump splice on the bar line + engine timing fixes.** Jumps
+  still felt like jumps when fast-forwarding. Root cause was *not* the grid —
+  a whole-track comb search confirmed BPM = **130.000** exactly and the downbeat
+  at **1.363 s** (DB's 1.37 is within 7 ms, correct). Three engine fixes:
+  (1) the splice now executes on the next boundary of the **snap unit** (the next
+  downbeat in BAR mode) instead of the next beat, so the cut lands on a musical
+  line rather than mid-bar — the actual cause of the leftover "jump"; (2)
+  `startSource` schedules ~20 ms ahead and anchors `startedAt` to the true start
+  time, removing the output-latency drift that skewed every later splice
+  boundary; (3) the splice crossfade is now equal-power (sin/cos, 8 ms) and the
+  no-op guard (click ≈ playhead) runs **before** any fade/stop is scheduled,
+  fixing a latent dropout where the old source was silenced with no replacement.
+  Trade-off: BAR-mode jumps again wait up to one bar (the musically-correct
+  behavior); BEAT mode stays ≤1 beat for snappier moves.

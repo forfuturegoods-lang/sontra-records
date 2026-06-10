@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "Audio preload shipped (1.7.9): first player preloads on page load, others on hover/touch — first play near-instant; shares loadBuffer cache with play(). Security closed: secret key rotated (old dead), team pass all-lowercase. Open: STR001 buy/donate URLs.",
-      "spec_version": "1.7.9"
+      "focus": "Beat-jump fix (1.7.10): splice now on next BAR line (was next beat) so cuts land musically; +latency-anchored start, equal-power 8ms fade, dropout guard fix. Comb-search confirms grid exact (130.000 BPM, downbeat 1.363s ~ DB 1.37). Needs user listen-test. Open: STR001 buy/donate URLs.",
+      "spec_version": "1.7.10"
     },
     "claude-remote": {
       "last_sync": null,

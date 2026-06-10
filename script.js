@@ -558,8 +558,19 @@ function setupPlayer(player) {
     source = n.src; gainNode = n.g;
     source.onended = onNaturalEnd;
     offsetAt  = Math.max(0, Math.min(buffer.duration, offset));
-    startedAt = ctx.currentTime;
-    source.start(0, offsetAt);
+    // schedule a hair ahead so startedAt is the *true* start time (start(0) drifts
+    // by the output latency, which would skew every later splice boundary)
+    startedAt = ctx.currentTime + 0.02;
+    source.start(startedAt, offsetAt);
+  }
+  // equal-power crossfade curve (sin/cos) → constant loudness, no click at splices
+  function fadeCurve(rising) {
+    const N = 32, a = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      const t = (i / (N - 1)) * (Math.PI / 2);
+      a[i] = rising ? Math.sin(t) : Math.cos(t);
+    }
+    return a;
   }
   function stopSource() {
     clearPending();
@@ -645,12 +656,13 @@ function setupPlayer(player) {
   btn.addEventListener("click", () => { playing ? stop() : play(); });
 
   // seek. While playing with snap on, jumps are PHASE-PRESERVING BEAT-JUMPS
-  // (Traktor-style): the jump DISTANCE is quantized to whole snap units
-  // relative to the playhead — whole bars in BAR mode, so the kick/snare bar
-  // structure survives every jump — and the splice executes sample-accurately
-  // on the next beat boundary with a short crossfade. Paused or snap-off
+  // (Traktor-style): the jump DISTANCE is quantized to whole snap units relative
+  // to the playhead — whole bars in BAR mode, so the kick/snare bar structure
+  // survives — and the splice executes sample-accurately ON the next boundary of
+  // that same unit (the next downbeat in BAR mode), so the cut lands on a musical
+  // line, not mid-bar. Equal-power crossfade kills the click. Paused or snap-off
   // seeks are immediate.
-  const DECLICK = 0.003;               // crossfade at the splice (seconds)
+  const FADE = 0.008;                  // crossfade length at the splice (seconds)
   function seekTo(p) {
     const raw = (Math.max(0, Math.min(100, p)) / 100) * total();
     if (buffer && playing && snap !== "off") { queueJump(raw); return; }
@@ -663,15 +675,15 @@ function setupPlayer(player) {
     const ctx = audioCtx();
     promote();                          // a due splice first, so state is current
     const unit = snap === "bar" ? barDur : beatDur;
-    let at, splicePos;                  // ctx-time of the splice + buffer pos there
     const reAim = !!pending;
+    let at, splicePos;                  // ctx-time of the splice + buffer pos there
     if (reAim) {                        // keep the already-scheduled boundary
       at = pending.at; splicePos = pending.splicePos;
-    } else {                            // next BEAT boundary (≤1 beat away — snappy
-      const next = beatOffset +         // even in BAR mode; bars are kept by delta)
-        Math.ceil((position() - beatOffset) / beatDur) * beatDur;
+    } else {                            // next boundary of the SNAP UNIT (downbeat
+      const next = beatOffset +         // in BAR mode) → splice lands on a musical line
+        Math.ceil((position() - beatOffset) / unit) * unit;
       at = startedAt + (next - offsetAt);
-      while (at < ctx.currentTime + 0.05) at += beatDur;  // scheduling headroom
+      while (at < ctx.currentTime + 0.06) at += unit;     // scheduling headroom
       splicePos = offsetAt + (at - startedAt);
     }
     // jump a whole number of units from the splice point → phase continues;
@@ -679,22 +691,24 @@ function setupPlayer(player) {
     let delta = Math.round((raw - splicePos) / unit) * unit;
     while (splicePos + delta >= buffer.duration) delta -= unit;
     while (splicePos + delta < 0) delta += unit;
-    if (!reAim && Math.abs(delta) < unit / 2) return;     // lands where it plays — no-op
+    if (Math.abs(delta) < unit / 2) {   // lands where it already plays
+      if (!reAim) return;               // nothing scheduled yet → bail clean (no dropout)
+      delta = 0;                        // re-aim onto the playhead → cancels the jump
+    }
     const target = splicePos + delta;
     if (reAim) {                        // swap the queued source for the new target
       pending.src.onended = null;
       try { pending.src.stop(); pending.src.disconnect(); pending.g.disconnect(); } catch (e) {}
       pending = null;
-    } else {                            // fade the playing source out at the splice
-      gainNode.gain.setValueAtTime(1, at);
-      gainNode.gain.linearRampToValueAtTime(0, at + DECLICK);
+    } else {                            // fade the playing source out across the splice
+      gainNode.gain.cancelScheduledValues(at);
+      gainNode.gain.setValueCurveAtTime(fadeCurve(false), at, FADE);
       source.onended = null;
-      try { source.stop(at + DECLICK + 0.005); } catch (e) {}
+      try { source.stop(at + FADE + 0.02); } catch (e) {}
     }
     const n = newNode();
     n.src.onended = onNaturalEnd;
-    n.g.gain.setValueAtTime(0, at);
-    n.g.gain.linearRampToValueAtTime(1, at + DECLICK);
+    n.g.gain.setValueCurveAtTime(fadeCurve(true), at, FADE);
     n.src.start(at, target);
     pending = { src: n.src, g: n.g, at, splicePos, offset: target };
     player.classList.add("is-queued");
