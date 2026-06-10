@@ -140,7 +140,7 @@ async function loadList() {
     const hasAudio = r.audio_path ? "· audio ✓" : "· no audio";
     return `
       <div class="rel-item">
-        <img src="${cover}" alt="" />
+        <a href="index.html" class="rel-item__home" title="Exit to the main site"><img src="${cover}" alt="${esc(r.title)} cover — exit to the site" /></a>
         <div class="rel-item__meta">
           <div class="rel-item__title">${esc(r.title)} — ${esc(r.artist)}</div>
           <div class="rel-item__sub">${esc(r.catalog)} · ${esc(r.genre || "—")} · ${esc(r.year || "—")} ${hasAudio}</div>

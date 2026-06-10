@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.8.0
+- **Spec version:** 1.8.1
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -321,3 +321,8 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   small gap (the sample-accurate splice needs the full buffer). `preloadAudio()`
   skips buffer pre-decode when streaming. Both paths verified to render; live
   mobile playback still to be listen-tested.
+- **2026-06-10 — Admin: exits to the main site.** The admin page was a dead-end
+  (no way back). Two exits now both link to `index.html`: the top-left **"Sontra
+  Records" title** (now an `<a>`) and a **release's artwork thumbnail** in the
+  catalog list (wrapped in a link with a ↗ hover hint). Edit/Delete buttons are
+  unaffected.
