@@ -470,6 +470,7 @@ function initPlayers() {
    never bulk-downloads. play() awaits the same loadBuffer cache entry, so
    pressing play mid-preload just joins the in-flight fetch+decode. */
 function preloadAudio() {
+  if (useStreaming()) return;          // streaming engine doesn't pre-decode whole buffers
   const players = [...document.querySelectorAll("[data-player]")]
     .filter(p => p.dataset.audio);
   if (!players.length) return;
@@ -481,7 +482,132 @@ function preloadAudio() {
   });
 }
 
+/* Pick the playback engine per player:
+   • mobile / low-memory → STREAM via an <audio> element (near-zero RAM; the beat
+     grid + bar/beat/off snapping still work, but a seek is a quantized jump with
+     a tiny gap, not the desktop gapless splice).
+   • desktop             → the Web Audio BUFFER engine (gapless beat-jumps).
+   Demo (no audio) always uses the buffer path's silent ramp.
+   Test override: add ?stream or ?buffer to the URL. */
+function useStreaming() {
+  if (/[?&]stream(?:=1)?(?:&|$)/.test(location.search)) return true;
+  if (/[?&]buffer(?:=1)?(?:&|$)/.test(location.search)) return false;
+  const uaMobile = !!(navigator.userAgentData && navigator.userAgentData.mobile);
+  const reMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent || "");
+  const lowMem   = !!(navigator.deviceMemory && navigator.deviceMemory <= 4);
+  return uaMobile || reMobile || lowMem;
+}
+
 function setupPlayer(player) {
+  const audioUrl = player.dataset.audio || "";
+  if (audioUrl && useStreaming()) setupStreamingPlayer(player);
+  else                            setupBufferPlayer(player);
+}
+
+/* Memory-safe streaming engine (mobile). Plays through a streamed <audio>
+   element — the browser decodes on the fly, so the whole track never sits in
+   RAM. Same beat grid + snapping; seeks are quantized to the grid (small gap at
+   the cut, unlike the desktop gapless splice). */
+function setupStreamingPlayer(player) {
+  const btn       = player.querySelector("[data-play]");
+  const scrub     = player.querySelector("[data-scrub]");
+  const fg        = player.querySelector("[data-fg]");
+  const timeEl    = player.querySelector("[data-time]");
+  const grid      = player.querySelector("[data-grid]");
+  const snapBtn   = player.querySelector("[data-snap]");
+  const snapLabel = player.querySelector("[data-snap-label]");
+  if (!btn || !scrub || !fg) return;
+
+  const bpm        = parseFloat(player.dataset.bpm) || DEFAULT_BPM;
+  const beatOffset = parseFloat(player.dataset.beatOffset) || 0;
+  const beatDur    = 60 / bpm;
+  const barDur     = beatDur * BEATS_PER_BAR;
+  let   snap       = "bar";
+
+  const audio = new Audio();           // streamed — not fully decoded into RAM
+  audio.preload = "metadata";
+  audio.src = player.dataset.audio;
+  player.classList.add("is-streaming");
+
+  let playing = false, raf = null;
+  const fmt = sec => { const m = Math.floor(sec/60), s = Math.floor(sec%60); return m + ":" + String(s).padStart(2,"0"); };
+  const total = () => (audio.duration && isFinite(audio.duration)) ? audio.duration : 0;
+
+  function updateGrid() {
+    if (!grid) return;
+    const t = total(); if (!t) return;
+    grid.style.setProperty("--beat-pct", (beatDur / t * 100) + "%");
+    grid.style.setProperty("--bar-pct",  (barDur  / t * 100) + "%");
+  }
+  function quantize(sec) {
+    if (snap === "off") return sec;
+    const unit = snap === "bar" ? barDur : beatDur;
+    const q = beatOffset + Math.round((sec - beatOffset) / unit) * unit;
+    return Math.max(0, Math.min(total() || sec, q));
+  }
+  function render() {
+    const t = total();
+    const pct = t ? Math.max(0, Math.min(100, audio.currentTime / t * 100)) : 0;
+    fg.style.clipPath = "inset(0 " + (100 - pct) + "% 0 0)";
+    scrub.setAttribute("aria-valuenow", Math.round(pct));
+    if (timeEl) timeEl.textContent = fmt((t || 0) * pct / 100);
+  }
+  function frame() { render(); raf = requestAnimationFrame(frame); }
+  function cancelRaf() { if (raf) cancelAnimationFrame(raf); raf = null; }
+
+  function stop() {
+    playing = false; audio.pause();
+    player.classList.remove("is-playing");
+    cancelRaf();
+    if (_activePlayer === api) _activePlayer = null;
+  }
+  function play() {
+    if (_activePlayer && _activePlayer !== api) _activePlayer.stop();   // one at a time
+    playing = true;
+    _activePlayer = api;
+    player.classList.add("is-playing");
+    audio.play().catch(() => {});
+    raf = requestAnimationFrame(frame);
+  }
+  const api = { stop };
+
+  audio.addEventListener("loadedmetadata", () => { updateGrid(); render(); });
+  audio.addEventListener("ended", () => { stop(); audio.currentTime = 0; render(); });
+
+  btn.addEventListener("click", () => { playing ? stop() : play(); });
+
+  function seekTo(p) {
+    const t = total();
+    const sec = quantize((Math.max(0, Math.min(100, p)) / 100) * (t || 0));
+    if (t) audio.currentTime = sec;
+    render();
+  }
+  scrub.addEventListener("click", e => {
+    const r = scrub.getBoundingClientRect();
+    seekTo(((e.clientX - r.left) / r.width) * 100);
+  });
+  scrub.addEventListener("keydown", e => {
+    const t = total();
+    const stepPct = snap === "off" ? 5 : ((snap === "beat" ? beatDur : barDur) / (t || 1)) * 100;
+    const cur = t ? (audio.currentTime / t) * 100 : 0;
+    if (e.key === "ArrowRight")     { seekTo(cur + stepPct); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { seekTo(cur - stepPct); e.preventDefault(); }
+  });
+
+  if (snapBtn) {
+    const MODES = ["bar", "beat", "off"];
+    snapBtn.addEventListener("click", () => {
+      snap = MODES[(MODES.indexOf(snap) + 1) % MODES.length];
+      if (snapLabel) snapLabel.textContent = snap.toUpperCase();
+      player.classList.toggle("snap-off", snap === "off");
+    });
+  }
+
+  updateGrid();
+  render();
+}
+
+function setupBufferPlayer(player) {
   const btn       = player.querySelector("[data-play]");
   const scrub     = player.querySelector("[data-scrub]");
   const fg        = player.querySelector("[data-fg]");

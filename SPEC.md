@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.10
+- **Spec version:** 1.8.0
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -65,7 +65,11 @@ cover (image), audio (file/URL), buyUrl, donateUrl
   `audio:` path per release (any browser format: mp3/m4a/ogg/wav). With audio off
   it runs as a silent visual demo. `customPlayer()` builds it; `setupPlayer()`
   wires playback via the **Web Audio API** (decode-once buffer playback —
-  sample-accurate, gapless). **Beat grid (Ableton-style):** each release has a `bpm`; the
+  sample-accurate, gapless) on **desktop**. **Mobile / low-memory devices stream**
+  instead (`useStreaming()` → `setupStreamingPlayer`, a streamed `<audio>` element)
+  so the whole track never sits in RAM; the grid + snapping still work but a seek
+  is a quantized jump with a small gap (the gapless splice needs the full buffer).
+  **Beat grid (Ableton-style):** each release has a `bpm`; the
   player draws a tempo grid on the waveform and seeking **snaps to it** (snap
   control cycles bar / beat / off) so jumps land in time. Seeks while playing
   are **phase-preserving beat-jumps** (Traktor-style): the jump *distance* is
@@ -306,3 +310,14 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   fixing a latent dropout where the old source was silenced with no replacement.
   Trade-off: BAR-mode jumps again wait up to one bar (the musically-correct
   behavior); BEAT mode stays ≤1 beat for snappier moves.
+- **2026-06-10 — Mobile streaming fallback (memory-safe playback).** The Web
+  Audio buffer engine decodes the whole track into RAM (~130 MB for a 5-min
+  48 kHz file) — fine on desktop, risky on phones. Added `useStreaming()` (mobile
+  UA / `navigator.userAgentData.mobile` / `deviceMemory ≤ 4`; test override
+  `?stream` / `?buffer`) and a `setupPlayer` dispatcher: desktop →
+  `setupBufferPlayer` (gapless beat-jump); mobile/low-mem → `setupStreamingPlayer`,
+  which plays a streamed `<audio>` element (near-zero RAM). The beat grid +
+  bar/beat/off snapping work in both; a streamed seek is a quantized jump with a
+  small gap (the sample-accurate splice needs the full buffer). `preloadAudio()`
+  skips buffer pre-decode when streaming. Both paths verified to render; live
+  mobile playback still to be listen-tested.
