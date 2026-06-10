@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.8.1
+- **Spec version:** 1.8.2
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -37,7 +37,10 @@ iframes; email signups go through a free third-party service (Formspree/Mailchim
 | `releases.html` | Page header · Year/Genre filters · Full catalog grid           |
 | `about.html`    | Editorial manifesto · Label stats · CTAs                       |
 
-Shared components: sticky navbar (hamburger ≤680px), release card, footer.
+Shared components: sticky navbar (hamburger ≤680px), release card, footer. The
+navbar also carries an **Admin** link (after About) that is hidden by default and
+revealed only when a team member is signed in to Supabase — the counterpart to
+the admin page's exits back to the site (§11).
 
 ## 5. Data model — single source of truth
 
@@ -326,3 +329,11 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   Records" title** (now an `<a>`) and a **release's artwork thumbnail** in the
   catalog list (wrapped in a link with a ↗ hover hint). Edit/Delete buttons are
   unaffected.
+- **2026-06-10 — Admin link in the main nav (signed-in only).** The reverse trip:
+  every page's navbar gets an **Admin** item (`<li class="nav__admin">` → `admin.html`)
+  placed after About. It is `display:none` by default; `script.js` checks the
+  shared Supabase session on load (`auth.getSession()`, plus `onAuthStateChange`)
+  and adds `.is-visible` only when a team member is signed in — so the public
+  never sees it, but logged-in staff get a one-click hop back to the CMS from any
+  page. Session is shared via Supabase's localStorage, so signing in once on
+  `admin.html` lights the link up across the whole site.

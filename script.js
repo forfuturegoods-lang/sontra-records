@@ -322,6 +322,25 @@ function initNav() {
   );
 }
 
+/* Reveal the nav "Admin" link only when a team member is signed in to Supabase.
+   The session is shared via localStorage, so signing in on admin.html lights this
+   link up across the whole public site. Hidden from everyone else. Checked on
+   load and kept in sync via onAuthStateChange (e.g. logout in another tab). */
+async function initAdminLink() {
+  const items = document.querySelectorAll(".nav__admin");
+  if (!items.length) return;
+  if (!(window.supabaseReady && window.supabaseReady())) return;   // not configured → stays hidden
+  const c = window.supabaseClient && window.supabaseClient();
+  if (!c) return;
+
+  const apply = session => items.forEach(li => li.classList.toggle("is-visible", !!session));
+  try {
+    const { data } = await c.auth.getSession();
+    apply(data.session);
+  } catch (_) { /* on any error, leave it hidden */ }
+  c.auth.onAuthStateChange((_e, session) => apply(session));
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
    FILTERS (releases page) — build year + genre toggle buttons from the data,
    then show/hide cards. Pure CSS/JS, no backend.
@@ -904,6 +923,7 @@ document.addEventListener("DOMContentLoaded", initSite);
 
 async function initSite() {
   initNav();
+  initAdminLink();        // show the "Admin" nav link if a team member is signed in
   initSubscribe();
 
   const y = document.getElementById("copyright-year");

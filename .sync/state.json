@@ -1,7 +1,7 @@
 {
   "$schema_version": 1,
   "comment": "Sync-bus heartbeat. Each node updates its entry on every push. See .sync/BUS.md.",
-  "spec_version": "1.8.1",
+  "spec_version": "1.8.2",
   "github": {
     "connected": true,
     "url": "https://github.com/forfuturegoods-lang/sontra-records.git",
@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "Admin exits (1.8.1): admin page was a dead-end — added two links back to index.html: top-left 'Sontra Records' title (now <a>) + each release's artwork thumbnail in the catalog list (↗ hover hint). Edit/Delete untouched. (Open: buy/donate URLs; real artwork/audio; mobile listen-test.)",
-      "spec_version": "1.8.1"
+      "focus": "Admin nav link (1.8.2): reverse trip — every page's navbar now has an 'Admin' item after About (<li class='nav__admin'>→admin.html), display:none by default. initAdminLink() in script.js checks the shared Supabase session (auth.getSession + onAuthStateChange) and adds .is-visible only when a team member is signed in; public never sees it. Verified: hidden when logged out, shows next to Home/Releases/About when .is-visible. (Open: buy/donate URLs; real artwork/audio; mobile listen-test.)",
+      "spec_version": "1.8.2"
     },
     "claude-remote": {
       "last_sync": null,

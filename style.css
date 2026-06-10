@@ -214,6 +214,11 @@ h1, h2, h3, h4 {
   background: var(--surface-2);
 }
 
+/* Admin link — only revealed when a team member is signed in (script.js adds
+   .is-visible after checking the Supabase session). Hidden from the public. */
+.nav__admin { display: none; }
+.nav__admin.is-visible { display: list-item; }
+
 /* Hamburger — hidden on desktop */
 .nav__toggle {
   display: none;
