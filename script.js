@@ -464,6 +464,23 @@ function initPlayers() {
   document.querySelectorAll("[data-player]").forEach(setupPlayer);
 }
 
+/* Warm the audio cache so first play doesn't wait on the full download.
+   The first player on the page (homepage hero = newest release) preloads
+   immediately; the rest preload on first hover/touch/focus so a large catalog
+   never bulk-downloads. play() awaits the same loadBuffer cache entry, so
+   pressing play mid-preload just joins the in-flight fetch+decode. */
+function preloadAudio() {
+  const players = [...document.querySelectorAll("[data-player]")]
+    .filter(p => p.dataset.audio);
+  if (!players.length) return;
+  const warm = p => loadBuffer(p.dataset.audio);
+  warm(players[0]);
+  players.slice(1).forEach(p => {
+    ["pointerenter", "touchstart", "focusin"].forEach(ev =>
+      p.addEventListener(ev, () => warm(p), { once: true, passive: true }));
+  });
+}
+
 function setupPlayer(player) {
   const btn       = player.querySelector("[data-play]");
   const scrub     = player.querySelector("[data-scrub]");
@@ -767,6 +784,7 @@ async function initSite() {
   initFilters(releases);
 
   initPlayers();          // wire up the interactive players
+  preloadAudio();         // warm the decode cache — first play is near-instant
 
   // Footer release count, if present.
   document.querySelectorAll("[data-release-count]").forEach(el => {

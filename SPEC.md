@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.8
+- **Spec version:** 1.7.9
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -75,7 +75,12 @@ cover (image), audio (file/URL), buyUrl, donateUrl
   the **next beat boundary** (short wait ≤ 1 beat; a blinking cue marker shows
   the landing point) with a ~3 ms crossfade so there is no click. Arrow keys
   step from the queued target, so repeated presses accumulate. With snap off
-  (or while paused) seeks are immediate and unquantized. *Optional:* Bandcamp
+  (or while paused) seeks are immediate and unquantized. **Audio preload:** the
+  first player on the page (homepage hero = newest release) starts fetching +
+  decoding its audio right after load, so first play is near-instant; every
+  other player preloads on first hover/touch/focus (intent), not eagerly — a
+  large catalog never bulk-downloads. All paths share the decode cache, so a
+  play during preload waits on the same promise (no double fetch). *Optional:* Bandcamp
   embeds remain available via
   `BANDCAMP_ENABLED` + a real `albumId` (`bandcampSrc`, styled
   `bgcol=111111 / linkcol=ffffff`).
@@ -279,3 +284,11 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   fall back to empty strings, and the releases-page filter pills exclude
   null/empty values (no more "null" toggle). A release without genre/year now
   just shows less, never "null".
+- **2026-06-10 — Audio preload (slow first-play fix).** Live verification
+  measured the 10.7 MB first-play fetch at 6–77 s depending on network, all
+  spent after the user pressed play. Now `preloadAudio()` (called from
+  `initSite` after `initPlayers`) warms the existing `loadBuffer` cache: the
+  first `[data-player][data-audio]` on the page immediately, the rest on first
+  `pointerenter`/`touchstart`/`focusin`. Decode runs on the (suspended-ok)
+  shared AudioContext; `play()` already awaits the same cached promise, so
+  pressing play mid-preload just joins the in-flight load. No UI change.

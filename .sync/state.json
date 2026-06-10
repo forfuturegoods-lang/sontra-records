@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "Empty-genre render guard shipped (1.7.8): metaLine() skips missing genre/year in card+hero, filter pills exclude null — 'NULL' can't reappear for genre-less releases. Remaining: slow first-play fetch (preload/128k); STR001 buy/donate URLs.",
-      "spec_version": "1.7.8"
+      "focus": "Audio preload shipped (1.7.9): first player preloads on page load, others on hover/touch — first play near-instant; shares loadBuffer cache with play(). Security closed: secret key rotated (old dead), team pass all-lowercase. Open: STR001 buy/donate URLs.",
+      "spec_version": "1.7.9"
     },
     "claude-remote": {
       "last_sync": null,
