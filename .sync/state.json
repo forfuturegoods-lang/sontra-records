@@ -11,7 +11,7 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "STR001 live + player verified by user. Cache-control fixed on storage uploads (was no-cache → re-downloads). Team login working; TEAM-GUIDE.md added (admin.html workflow + dashboard fallback). Next: set STR001 BPM/beat_offset for the beat grid.",
+      "focus": "STR001 complete: bpm=130, beat_offset=1.37s set (detected via spectral-flux analysis of the WAV master) — beat grid active. Open: genre/buy/donate URLs unset; verify grid feel on the site.",
       "spec_version": "1.7.3"
     },
     "claude-remote": {
