@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.8.4
+- **Spec version:** 1.8.5
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -35,7 +35,7 @@ iframes; email signups go through a free third-party service (Formspree/Mailchim
 |-----------------|----------------------------------------------------------------|
 | `index.html`    | Hero · Latest Releases (3 newest) · All Releases · Subscribe    |
 | `releases.html` | Page header · Year/Genre filters · Full catalog grid           |
-| `about.html`    | Editorial manifesto · Label stats · CTAs                       |
+| `about.html`    | Editorial manifesto · Label stats · Contact email · CTAs       |
 
 Shared components: sticky navbar (hamburger ≤680px), release card, footer. The
 navbar also carries **Admin** + **Log out** items (after About) that are hidden by
@@ -354,3 +354,9 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   `.player__meta` (`margin-right:auto`) to `.player__mini` (`margin-left:auto`),
   so the bar is now `[play] … [mini][time]` (and `[play] … [snap][time]` while
   playing). Title/artist remain in the player's `aria-label`, so no a11y loss.
+- **2026-06-10 — Team contact email on the About page.** Added the label's
+  contact address `demos@sontrarecords.com` to `about.html`: a visible
+  `.contact-line` ("Demos & enquiries: …") with a `mailto:` link, plus an
+  "Email the label" CTA button alongside the existing CTAs. The "we're always
+  listening" copy was reworded to invite demos by email. This is the team's
+  inbox (chosen by the owner) — update the address in `about.html` if it changes.

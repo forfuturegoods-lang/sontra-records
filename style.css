@@ -901,6 +901,22 @@ h1, h2, h3, h4 {
 
 .editorial .muted { color: var(--text-dim); }
 
+/* Team contact line (About page) */
+.contact-line {
+  margin-top: 16px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--text-dim);
+}
+.contact-line a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-strong);
+  padding-bottom: 1px;
+  transition: border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+.contact-line a:hover { border-color: var(--btn-hover); color: var(--btn-hover); }
+
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
