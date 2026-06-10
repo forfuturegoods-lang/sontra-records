@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Sontra Records — Team Navigator</title>
+<style>
+  /* One-screen cheat sheet (fits a MacBook screen ~1280×800). Brand tokens. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a; color: #e0e0e0;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    min-height: 100vh; display: flex; flex-direction: column;
+    padding: 28px 40px;
+  }
+  header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; }
+  h1 { font-size: 17px; letter-spacing: 0.22em; text-transform: uppercase; }
+  header .sub { font-size: 11px; color: #888; letter-spacing: 0.08em; }
+  .login {
+    background: #141414; border: 1px solid #333; border-radius: 3px;
+    padding: 10px 16px; margin-bottom: 16px; font-size: 12px; line-height: 1.7;
+    display: flex; gap: 28px; flex-wrap: wrap; align-items: center;
+  }
+  .login b { color: #fff; }
+  .login code { color: #fff; background: #222; padding: 1px 6px; border-radius: 2px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex: 1; }
+  .card {
+    background: #141414; border: 1px solid #333; border-radius: 3px; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .card h2 {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #fff;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .num {
+    flex: none; width: 22px; height: 22px; border-radius: 50%;
+    background: #d0d0d0; color: #0a0a0a; font-size: 12px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .card p, .card li { font-size: 11.5px; line-height: 1.65; color: #c8c8c8; }
+  .card ul { list-style: none; }
+  .card li::before { content: "·"; color: #888; margin-right: 7px; }
+  .card code {
+    color: #fff; background: #222; padding: 1px 5px; border-radius: 2px;
+    font-size: 10.5px; word-break: break-all;
+  }
+  .ok   { color: #9fdf9f; white-space: nowrap; }
+  .warn { color: #e8c87a; }
+  .danger-card { border-color: #5a3333; }
+  footer { margin-top: 14px; font-size: 10.5px; color: #888; letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sontra Records — Team Navigator</h1>
+  <span class="sub">publishing releases via the admin page · full guide: TEAM-GUIDE.md</span>
+</header>
+
+<div class="login">
+  <span><b>WHERE:</b> <code>https://&lt;your-site&gt;/admin.html</code></span>
+  <span><b>LOGIN:</b> <code>sontrarecords@gmail.com</code> · password — ask the label owner</span>
+  <span class="warn"><b>⚠ shared login:</b> tell the team chat before editing</span>
+</div>
+
+<div class="grid">
+
+  <div class="card">
+    <h2><span class="num">1</span>Prepare 2 files first</h2>
+    <ul>
+      <li>🎨 Artwork — JPG/PNG, <b>square</b>, ≥ 1400×1400</li>
+      <li>🎵 Audio — <b>under 50&nbsp;MB</b> (hard limit). A full WAV won't fit — convert it:</li>
+    </ul>
+    <p><code>afconvert -f m4af -d aac -b 256000 "in.wav" "out.m4a"</code></p>
+    <p>(Terminal, any Mac.) Keep the WAV master in the archive — upload the m4a.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">2</span>Sign in</h2>
+    <ul>
+      <li>Open the admin page → enter email + password → <b>Sign in</b></li>
+      <li>Left: <b>“New release”</b> form</li>
+      <li>Right: <b>Catalog</b> — everything already on the site</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">3</span>Fill the form</h2>
+    <ul>
+      <li><b>Catalog</b> — release number, e.g. <code>STR002</code> (names the files)</li>
+      <li><b>Title / Artist / Year / Genre</b> — as on the release</li>
+      <li><b>BPM</b> — track tempo (powers the beat grid)</li>
+      <li><b>Beat offset</b> — seconds to the first downbeat (<code>0</code> if it starts on the beat)</li>
+      <li><b>Artwork + Audio</b> — pick the 2 prepared files</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">4</span>Save → it's live</h2>
+    <ul>
+      <li>Click <b>Save</b> → “Uploading artwork… audio…” → <span class="ok">Saved ✓</span></li>
+      <li>The release is <b>immediately on the public site</b> — no deploy, no git</li>
+      <li>Verify: open the site → find it → press <b>play</b></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">5</span>Edit a release</h2>
+    <ul>
+      <li>Catalog list → <b>Edit</b> → change fields → <b>Save</b></li>
+      <li>Leave file pickers <b>empty</b> to keep the current audio/artwork</li>
+      <li>Pick a new file only to <b>replace</b> it</li>
+    </ul>
+  </div>
+
+  <div class="card danger-card">
+    <h2><span class="num">6</span>Delete a release</h2>
+    <ul>
+      <li>Catalog list → <b>Delete</b> → confirm</li>
+      <li>Removes it from the site immediately</li>
+      <li class="warn">No undo — when unsure, ask the owner first</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  Trouble signing in / 50 MB limit / anything weird → ping the label owner. · Admin page is internal — don't share the URL.
+</footer>
+
+</body>
+</html>

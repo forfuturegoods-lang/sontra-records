@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "Phase-preserving beat-jumps shipped (spec 1.7.5): jump DISTANCE quantized to whole bars/beats relative to playhead (Traktor-style) — kick/snare bar structure survives jumps; splice on next beat boundary (≤1 beat wait). Needs user listen-test. Open: STR001 genre/buy/donate URLs.",
-      "spec_version": "1.7.5"
+      "focus": "team-navigator.html added: one-screen (1280x800) cheat sheet for the team — login → upload → edit → delete; PNG exported to owner's Desktop. Beat-jumps (1.7.5) still awaiting user listen-test. Open: STR001 genre/buy/donate URLs.",
+      "spec_version": "1.7.6"
     },
     "claude-remote": {
       "last_sync": null,

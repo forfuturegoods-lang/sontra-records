@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.5
+- **Spec version:** 1.7.6
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -257,3 +257,10 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   always executes on the **next beat boundary** regardless of snap mode (max
   wait 1 beat, was up to a bar), and arrow keys step from the queued target so
   holding them accumulates whole bars/beats.
+- **2026-06-10 — Team navigator one-pager (`team-navigator.html`).** A
+  self-contained, brand-styled cheat sheet sized to one MacBook screen
+  (1280×800, verified headless): login → file prep (50 MB cap + `afconvert`
+  line) → form fields → save/verify → edit → delete, in 6 numbered cards. For
+  screenshotting/pinning in the team chat; `noindex`, not linked from the public
+  nav. Credentials are not embedded (repo is public-ish) — it says to ask the
+  owner. Condensed from `TEAM-GUIDE.md`, which remains the full reference.
