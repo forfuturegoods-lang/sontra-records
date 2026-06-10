@@ -11,7 +11,7 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "DEPLOYED: site live on GitHub Pages at forfuturegoods-lang.github.io/sontra-records/ (main/root, .nojekyll). Real admin URL wired into TEAM-GUIDE + navigator. Open: STR001 genre/buy/donate URLs; beat-jump listen-test.",
+      "focus": "Live site VERIFIED (headless Chrome/CDP): STR001 loads from Supabase, plays; beat-jump = exactly 127 bars, 0.0ms off grid; snap-off + pause/resume OK. Findings: hero shows literal 'NULL' genre (set genre or guard renderer); first-play fetch up to 77s on slow nets (consider preload/128k).",
       "spec_version": "1.7.7"
     },
     "claude-remote": {
