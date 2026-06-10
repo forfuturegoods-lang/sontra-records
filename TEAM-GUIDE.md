@@ -13,7 +13,8 @@ password. Everyone uses the same account for now.
 
 ### 1. Open the admin page
 
-Go to **`https://<your-site>/admin.html`** (wherever the site is deployed).
+Go to **<https://forfuturegoods-lang.github.io/sontra-records/admin.html>**
+(the site is deployed on GitHub Pages from `main` — every push redeploys it).
 
 Testing locally instead: run `python3 -m http.server 8000` in the project
 folder, then open <http://localhost:8000/admin.html>.

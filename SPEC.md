@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.6
+- **Spec version:** 1.7.7
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -25,7 +25,9 @@ iframes; email signups go through a free third-party service (Formspree/Mailchim
 
 - HTML5, CSS3 (vanilla, no framework), vanilla JS.
 - Typeface: JetBrains Mono (Google Fonts).
-- Hosting: any static host (Netlify / Vercel / GitHub Pages / Cloudflare Pages).
+- Hosting: **GitHub Pages** (live) — <https://forfuturegoods-lang.github.io/sontra-records/>,
+  built from `main` / root (`.nojekyll`, legacy build); every push redeploys.
+  Any other static host also works.
 
 ## 4. Pages
 
@@ -264,3 +266,9 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   screenshotting/pinning in the team chat; `noindex`, not linked from the public
   nav. Credentials are not embedded (repo is public-ish) — it says to ask the
   owner. Condensed from `TEAM-GUIDE.md`, which remains the full reference.
+- **2026-06-10 — Deployed to GitHub Pages.** Site live at
+  <https://forfuturegoods-lang.github.io/sontra-records/> (repo is public; Pages
+  source = `main` / root, legacy build, `.nojekyll` added so files serve as-is,
+  HTTPS enforced). Every push to `main` redeploys automatically. The admin page
+  is now reachable for the team at `/sontra-records/admin.html`; real URLs wired
+  into `TEAM-GUIDE.md` + `team-navigator.html` (placeholders removed).

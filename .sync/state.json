@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "team-navigator.html added: one-screen (1280x800) cheat sheet for the team — login → upload → edit → delete; PNG exported to owner's Desktop. Beat-jumps (1.7.5) still awaiting user listen-test. Open: STR001 genre/buy/donate URLs.",
-      "spec_version": "1.7.6"
+      "focus": "DEPLOYED: site live on GitHub Pages at forfuturegoods-lang.github.io/sontra-records/ (main/root, .nojekyll). Real admin URL wired into TEAM-GUIDE + navigator. Open: STR001 genre/buy/donate URLs; beat-jump listen-test.",
+      "spec_version": "1.7.7"
     },
     "claude-remote": {
       "last_sync": null,
