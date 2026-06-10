@@ -10,8 +10,8 @@
   },
   "nodes": {
     "claude-local": {
-      "last_sync": "2026-06-09",
-      "focus": "Supabase backend LIVE + verified: schema run, public read returns [] (200), anon write blocked by RLS (401). Next: log into /admin.html and add the first release.",
+      "last_sync": "2026-06-10",
+      "focus": "First release LIVE: STR001 'Where is James (DOTT remix)' by Anton Rotof — audio (256k AAC m4a; 98MB WAV master exceeds free-tier 50MB cap) + artwork in storage, row in releases. Next: test player on site; set BPM/beat_offset for the beat grid.",
       "spec_version": "1.7.2"
     },
     "claude-remote": {
