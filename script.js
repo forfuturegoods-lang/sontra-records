@@ -237,9 +237,13 @@ function esc(str) {
    RELEASE CARD TEMPLATE
    Returns the HTML for one card. Reused on every page for consistency.
    ────────────────────────────────────────────────────────────────────────── */
+/* "Genre · Year" meta line — skips missing parts, so a release without a
+   genre (or year) never prints a literal "null". */
+const metaLine = r => [r.genre, r.year].filter(Boolean).map(esc).join(" · ");
+
 function releaseCard(r) {
   return `
-  <article class="release-card" data-year="${esc(r.year)}" data-genre="${esc(r.genre)}">
+  <article class="release-card" data-year="${esc(r.year ?? "")}" data-genre="${esc(r.genre ?? "")}">
     <div class="release-card__art">
       <img src="${esc(r.cover)}" alt="${esc(r.title)} — cover art" loading="lazy" />
       <span class="release-card__catalog">${esc(r.catalog)}</span>
@@ -249,7 +253,7 @@ function releaseCard(r) {
       <div>
         <h3 class="release-card__title">${esc(r.title)}</h3>
         <p class="release-card__artist">${esc(r.artist)}</p>
-        <p class="release-card__sub">${esc(r.genre)} · ${esc(r.year)}</p>
+        <p class="release-card__sub">${metaLine(r)}</p>
       </div>
 
       <!-- Bandcamp player slot. Shows a styled placeholder until BANDCAMP_ENABLED
@@ -277,7 +281,7 @@ function heroFeatureCard(r) {
       <span class="eyebrow">Newest release</span>
       <h2 class="feature__title">${esc(r.title)}</h2>
       <p class="feature__artist">${esc(r.artist)}</p>
-      <p class="feature__sub">${esc(r.genre)} · ${esc(r.year)}</p>
+      <p class="feature__sub">${metaLine(r)}</p>
       ${bandcampPlayer(r)}
       <div class="feature__actions">
         <a class="btn btn--solid"  href="${esc(r.buyUrl)}"    target="_blank" rel="noopener">Buy on Bandcamp</a>
@@ -333,8 +337,9 @@ function initFilters(releases) {
   const state = { year: "all", genre: "all" };
 
   // unique, sorted values pulled straight from the loaded releases
-  const years  = [...new Set(releases.map(r => r.year))].sort((a, b) => b - a);
-  const genres = [...new Set(releases.map(r => r.genre))].sort();
+  // (missing genre/year excluded so no "null" pill appears)
+  const years  = [...new Set(releases.map(r => r.year).filter(Boolean))].sort((a, b) => b - a);
+  const genres = [...new Set(releases.map(r => r.genre).filter(Boolean))].sort();
 
   // build a row of pill toggles into `bar`; clicking sets state[key]
   function buildToggles(bar, key, values) {

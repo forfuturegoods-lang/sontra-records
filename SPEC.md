@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.7
+- **Spec version:** 1.7.8
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -272,3 +272,10 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   HTTPS enforced). Every push to `main` redeploys automatically. The admin page
   is now reachable for the team at `/sontra-records/admin.html`; real URLs wired
   into `TEAM-GUIDE.md` + `team-navigator.html` (placeholders removed).
+- **2026-06-10 — Empty-genre render guard.** Live verification caught the hero
+  printing a literal "NULL" when a release's `genre` was null (STR001 before the
+  data fix). Card + hero meta lines now render via `metaLine()` — joins
+  `genre · year` skipping missing parts — card `data-genre`/`data-year` attrs
+  fall back to empty strings, and the releases-page filter pills exclude
+  null/empty values (no more "null" toggle). A release without genre/year now
+  just shows less, never "null".
