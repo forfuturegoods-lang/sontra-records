@@ -622,33 +622,48 @@ function setupPlayer(player) {
 
   btn.addEventListener("click", () => { playing ? stop() : play(); });
 
-  // seek, QUANTIZED to the grid. While playing with snap on, the jump is
-  // LAUNCH-QUANTIZED (Ableton-style): queued, then spliced in sample-accurately
-  // ON the next grid boundary with a short crossfade — beat phase never breaks.
-  // Paused or snap-off seeks are immediate.
+  // seek. While playing with snap on, jumps are PHASE-PRESERVING BEAT-JUMPS
+  // (Traktor-style): the jump DISTANCE is quantized to whole snap units
+  // relative to the playhead — whole bars in BAR mode, so the kick/snare bar
+  // structure survives every jump — and the splice executes sample-accurately
+  // on the next beat boundary with a short crossfade. Paused or snap-off
+  // seeks are immediate.
   const DECLICK = 0.003;               // crossfade at the splice (seconds)
   function seekTo(p) {
-    const sec = quantize((Math.max(0, Math.min(100, p)) / 100) * total());
-    if (buffer && playing && snap !== "off") { queueJump(sec); return; }
+    const raw = (Math.max(0, Math.min(100, p)) / 100) * total();
+    if (buffer && playing && snap !== "off") { queueJump(raw); return; }
+    const sec = quantize(raw);
     head = sec;
     if (buffer && playing) { stopSource(); startSource(sec); }
     render();
   }
-  function queueJump(target) {
+  function queueJump(raw) {
     const ctx = audioCtx();
     promote();                          // a due splice first, so state is current
-    let at;
-    if (pending) {                      // re-aim: keep the already-scheduled boundary
-      at = pending.at;
+    const unit = snap === "bar" ? barDur : beatDur;
+    let at, splicePos;                  // ctx-time of the splice + buffer pos there
+    const reAim = !!pending;
+    if (reAim) {                        // keep the already-scheduled boundary
+      at = pending.at; splicePos = pending.splicePos;
+    } else {                            // next BEAT boundary (≤1 beat away — snappy
+      const next = beatOffset +         // even in BAR mode; bars are kept by delta)
+        Math.ceil((position() - beatOffset) / beatDur) * beatDur;
+      at = startedAt + (next - offsetAt);
+      while (at < ctx.currentTime + 0.05) at += beatDur;  // scheduling headroom
+      splicePos = offsetAt + (at - startedAt);
+    }
+    // jump a whole number of units from the splice point → phase continues;
+    // clamp inside the track by whole units so the phase survives the clamp
+    let delta = Math.round((raw - splicePos) / unit) * unit;
+    while (splicePos + delta >= buffer.duration) delta -= unit;
+    while (splicePos + delta < 0) delta += unit;
+    if (!reAim && Math.abs(delta) < unit / 2) return;     // lands where it plays — no-op
+    const target = splicePos + delta;
+    if (reAim) {                        // swap the queued source for the new target
       pending.src.onended = null;
       try { pending.src.stop(); pending.src.disconnect(); pending.g.disconnect(); } catch (e) {}
       pending = null;
-    } else {
-      const unit = snap === "bar" ? barDur : beatDur;
-      const next = beatOffset + Math.ceil((position() - beatOffset) / unit) * unit;
-      at = startedAt + (next - offsetAt);
-      while (at < ctx.currentTime + 0.05) at += unit;   // leave scheduling headroom
-      // fade the playing source out across the splice, then stop it
+    } else {                            // fade the playing source out at the splice
       gainNode.gain.setValueAtTime(1, at);
       gainNode.gain.linearRampToValueAtTime(0, at + DECLICK);
       source.onended = null;
@@ -658,8 +673,8 @@ function setupPlayer(player) {
     n.src.onended = onNaturalEnd;
     n.g.gain.setValueAtTime(0, at);
     n.g.gain.linearRampToValueAtTime(1, at + DECLICK);
-    n.src.start(at, Math.max(0, Math.min(buffer.duration, target)));
-    pending = { src: n.src, g: n.g, at, offset: target };
+    n.src.start(at, target);
+    pending = { src: n.src, g: n.g, at, splicePos, offset: target };
     player.classList.add("is-queued");
     if (cue) cue.style.left = (target / total() * 100) + "%";
   }
@@ -668,10 +683,12 @@ function setupPlayer(player) {
     seekTo(((e.clientX - r.left) / r.width) * 100);
   });
   scrub.addEventListener("keydown", e => {
-    // arrows jump exactly one grid unit (or 5% when snap is off)
+    // arrows jump exactly one grid unit (or 5% when snap is off); while a jump
+    // is queued they step from its target, so repeated presses accumulate
     const stepPct = snap === "off" ? 5 : ((snap === "beat" ? beatDur : barDur) / total()) * 100;
-    if (e.key === "ArrowRight")     { seekTo(pct + stepPct); e.preventDefault(); }
-    else if (e.key === "ArrowLeft") { seekTo(pct - stepPct); e.preventDefault(); }
+    const basePct = pending ? (pending.offset / total()) * 100 : pct;
+    if (e.key === "ArrowRight")     { seekTo(basePct + stepPct); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { seekTo(basePct - stepPct); e.preventDefault(); }
   });
 
   // beat-grid snap control: cycle bar → beat → off

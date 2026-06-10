@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.4
+- **Spec version:** 1.7.5
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -65,12 +65,15 @@ cover (image), audio (file/URL), buyUrl, donateUrl
   wires playback via the **Web Audio API** (decode-once buffer playback —
   sample-accurate, gapless). **Beat grid (Ableton-style):** each release has a `bpm`; the
   player draws a tempo grid on the waveform and seeking **snaps to it** (snap
-  control cycles bar / beat / off) so jumps land in time. Seeks while playing are
-  **launch-quantized** (Ableton-style): the jump is *queued* and executes
-  sample-accurately **on the next grid boundary** (a blinking cue marker shows
-  the queued target), with a ~3 ms equal-power crossfade at the splice so the
-  beat phase never breaks and there is no click. With snap off (or while paused)
-  seeks are immediate. *Optional:* Bandcamp
+  control cycles bar / beat / off) so jumps land in time. Seeks while playing
+  are **phase-preserving beat-jumps** (Traktor-style): the jump *distance* is
+  quantized to whole snap units relative to the playhead — whole **bars** in BAR
+  mode (the kick/snare bar structure — snare on 2 & 4 — survives every jump) or
+  whole **beats** in BEAT mode — and the splice executes sample-accurately on
+  the **next beat boundary** (short wait ≤ 1 beat; a blinking cue marker shows
+  the landing point) with a ~3 ms crossfade so there is no click. Arrow keys
+  step from the queued target, so repeated presses accumulate. With snap off
+  (or while paused) seeks are immediate and unquantized. *Optional:* Bandcamp
   embeds remain available via
   `BANDCAMP_ENABLED` + a real `albumId` (`bandcampSrc`, styled
   `bgcol=111111 / linkcol=ffffff`).
@@ -241,3 +244,16 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   blinks at the queued target (`is-queued`) until the splice lands; re-clicking
   before the boundary re-aims the same boundary. Snap-off and paused seeks stay
   immediate.
+- **2026-06-10 — Phase-preserving beat-jumps (kick/snare structure fix).**
+  Launch-quantized seeking kept *beat* phase but snapped the landing point to an
+  absolute grid position, so a jump could land on a different beat-of-bar than
+  the splice point (e.g. beat 1 → beat 3): the snare-on-2-and-4 structure
+  flipped, which is audible when fast-forwarding. Reworked to Traktor-style
+  beat-jumps: the jump **distance** is quantized to whole snap units *relative
+  to the playhead* (`delta = round((click − splicePos)/unit) · unit`, clamped to
+  the track by whole units) — BAR mode therefore always moves whole bars and the
+  bar structure survives by construction; BEAT mode moves whole beats (a
+  deliberate 1-beat nudge is possible — that's what BEAT means). The splice now
+  always executes on the **next beat boundary** regardless of snap mode (max
+  wait 1 beat, was up to a bar), and arrow keys step from the queued target so
+  holding them accumulates whole bars/beats.
