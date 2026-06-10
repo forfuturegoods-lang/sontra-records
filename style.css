@@ -214,10 +214,30 @@ h1, h2, h3, h4 {
   background: var(--surface-2);
 }
 
-/* Admin link — only revealed when a team member is signed in (script.js adds
-   .is-visible after checking the Supabase session). Hidden from the public. */
+/* Admin link + Log out button — only revealed when a team member is signed in
+   (script.js adds .is-visible after checking the Supabase session). Hidden from
+   the public. */
 .nav__admin { display: none; }
 .nav__admin.is-visible { display: list-item; }
+
+/* Log out button — matches the nav links, with a red-tinted hover to signal the
+   sign-out action. */
+.nav__logout {
+  font-family: var(--font);
+  display: inline-block;
+  padding: 8px 14px;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease),
+              background 0.15s var(--ease);
+}
+.nav__logout:hover { color: #e0a0a0; border-color: #e0a0a0; }
 
 /* Hamburger — hidden on desktop */
 .nav__toggle {

@@ -4,7 +4,7 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.8.2
+- **Spec version:** 1.8.3
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
 - **Last updated:** 2026-06-10
 
@@ -38,9 +38,10 @@ iframes; email signups go through a free third-party service (Formspree/Mailchim
 | `about.html`    | Editorial manifesto · Label stats · CTAs                       |
 
 Shared components: sticky navbar (hamburger ≤680px), release card, footer. The
-navbar also carries an **Admin** link (after About) that is hidden by default and
-revealed only when a team member is signed in to Supabase — the counterpart to
-the admin page's exits back to the site (§11).
+navbar also carries **Admin** + **Log out** items (after About) that are hidden by
+default and revealed only when a team member is signed in to Supabase — Admin
+opens the CMS, Log out ends the session (hiding both again). These are the
+counterpart to the admin page's exits back to the site (§11).
 
 ## 5. Data model — single source of truth
 
@@ -337,3 +338,11 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   never sees it, but logged-in staff get a one-click hop back to the CMS from any
   page. Session is shared via Supabase's localStorage, so signing in once on
   `admin.html` lights the link up across the whole site.
+- **2026-06-10 — Log out button in the main nav (signed-in only).** Alongside the
+  Admin link, every page's navbar now carries a **Log out** button
+  (`<li class="nav__admin"><button class="nav__logout">`), revealed by the same
+  session check (the former `initAdminLink` is generalized to `initSessionNav`,
+  which also wires the button to `auth.signOut()`). Signing out anywhere fires
+  `onAuthStateChange(null)` → both the Admin link and Log out button hide again,
+  and the user stays on the current page (no redirect). Styled to match the nav
+  links with a red-tinted hover to signal the sign-out action.

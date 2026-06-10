@@ -1,7 +1,7 @@
 {
   "$schema_version": 1,
   "comment": "Sync-bus heartbeat. Each node updates its entry on every push. See .sync/BUS.md.",
-  "spec_version": "1.8.2",
+  "spec_version": "1.8.3",
   "github": {
     "connected": true,
     "url": "https://github.com/forfuturegoods-lang/sontra-records.git",
@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "Admin nav link (1.8.2): reverse trip — every page's navbar now has an 'Admin' item after About (<li class='nav__admin'>→admin.html), display:none by default. initAdminLink() in script.js checks the shared Supabase session (auth.getSession + onAuthStateChange) and adds .is-visible only when a team member is signed in; public never sees it. Verified: hidden when logged out, shows next to Home/Releases/About when .is-visible. (Open: buy/donate URLs; real artwork/audio; mobile listen-test.)",
-      "spec_version": "1.8.2"
+      "focus": "Nav Log out button (1.8.3): added a signed-in-only 'Log out' button after the Admin link on every page (<li class='nav__admin'><button class='nav__logout'>). initAdminLink generalized to initSessionNav — same session reveal, plus wires the button to auth.signOut(); onAuthStateChange(null) then hides both Admin + Log out. Styled like nav links w/ red-tinted hover. Verified: both hidden logged-out, both show (Admin · Log out) when signed in. (Open: buy/donate URLs; real artwork/audio; mobile listen-test.)",
+      "spec_version": "1.8.3"
     },
     "claude-remote": {
       "last_sync": null,

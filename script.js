@@ -322,11 +322,12 @@ function initNav() {
   );
 }
 
-/* Reveal the nav "Admin" link only when a team member is signed in to Supabase.
-   The session is shared via localStorage, so signing in on admin.html lights this
-   link up across the whole public site. Hidden from everyone else. Checked on
-   load and kept in sync via onAuthStateChange (e.g. logout in another tab). */
-async function initAdminLink() {
+/* Show the signed-in-only nav items (Admin link + Log out button) only when a
+   team member is signed in to Supabase, and wire the Log out button. The session
+   is shared via localStorage, so signing in on admin.html lights these up across
+   the whole public site; signing out anywhere hides them again. Checked on load
+   and kept in sync via onAuthStateChange (e.g. logout in another tab). */
+async function initSessionNav() {
   const items = document.querySelectorAll(".nav__admin");
   if (!items.length) return;
   if (!(window.supabaseReady && window.supabaseReady())) return;   // not configured → stays hidden
@@ -339,6 +340,11 @@ async function initAdminLink() {
     apply(data.session);
   } catch (_) { /* on any error, leave it hidden */ }
   c.auth.onAuthStateChange((_e, session) => apply(session));
+
+  // Log out from any page; onAuthStateChange(null) then hides these items again.
+  document.querySelectorAll(".nav__logout").forEach(btn =>
+    btn.addEventListener("click", () => c.auth.signOut())
+  );
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -923,7 +929,7 @@ document.addEventListener("DOMContentLoaded", initSite);
 
 async function initSite() {
   initNav();
-  initAdminLink();        // show the "Admin" nav link if a team member is signed in
+  initSessionNav();       // show Admin link + Log out button if a team member is signed in
   initSubscribe();
 
   const y = document.getElementById("copyright-year");
