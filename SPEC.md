@@ -4,9 +4,9 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.7.2
-- **Status:** Live (Supabase backend verified: schema run, RLS enforced — see §11)
-- **Last updated:** 2026-06-09
+- **Spec version:** 1.7.3
+- **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
+- **Last updated:** 2026-06-10
 
 ---
 
@@ -205,3 +205,17 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   navbar (no transparency / image editing needed). A broken all-black earlier
   upload (`sontra_logo.png`) was removed. To update the logo, replace the file in
   `assets/`.
+- **2026-06-10 — First release live + team workflow documented (TEAM-GUIDE.md).**
+  STR001 "Where is James (DOTT remix)" by Anton Rotof published to Supabase:
+  audio `audio/str001.m4a` (256 kbps AAC — the 98 MB WAV master exceeds the
+  free-tier **50 MB upload cap**, so web audio is transcoded; masters stay
+  offline), artwork `covers/str001.jpg`, row in `releases`. Two operational
+  lessons captured: (1) storage uploads must set `cache-control: max-age=3600`
+  (the admin page's uploader does; a raw API upload without it stored `no-cache`,
+  forcing a full ~10 MB re-download on every play — fixed by re-uploading), and
+  (2) the shared team auth user (`sontrarecords@gmail.com`) is confirmed + working
+  after a reset via the Auth admin API. Added **`TEAM-GUIDE.md`**: the team
+  checklist for publishing releases via `admin.html` (login, file prep incl. the
+  50 MB limit + `afconvert` transcode line, form fields, edit/delete), with the
+  Supabase-dashboard manual flow as an owner-only fallback. BPM/`beat_offset` for
+  STR001 still unset — beat grid inactive until filled in.

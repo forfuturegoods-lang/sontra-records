@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "First release LIVE: STR001 'Where is James (DOTT remix)' by Anton Rotof — audio (256k AAC m4a; 98MB WAV master exceeds free-tier 50MB cap) + artwork in storage, row in releases. Next: test player on site; set BPM/beat_offset for the beat grid.",
-      "spec_version": "1.7.2"
+      "focus": "STR001 live + player verified by user. Cache-control fixed on storage uploads (was no-cache → re-downloads). Team login working; TEAM-GUIDE.md added (admin.html workflow + dashboard fallback). Next: set STR001 BPM/beat_offset for the beat grid.",
+      "spec_version": "1.7.3"
     },
     "claude-remote": {
       "last_sync": null,
