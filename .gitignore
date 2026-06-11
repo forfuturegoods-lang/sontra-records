@@ -7,3 +7,16 @@ Thumbs.db
 
 # Local server / logs
 *.log
+
+# Secrets — NEVER commit these (this is a PUBLIC repo).
+# The Supabase *publishable* key is intentionally in supabase-config.js (RLS-protected);
+# anything below is a real secret and must stay local.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+service-key*
+*service_role*
+*.secret

@@ -1,7 +1,7 @@
 {
   "$schema_version": 1,
   "comment": "Sync-bus heartbeat. Each node updates its entry on every push. See .sync/BUS.md.",
-  "spec_version": "1.8.6",
+  "spec_version": "1.8.7",
   "github": {
     "connected": true,
     "url": "https://github.com/forfuturegoods-lang/sontra-records.git",
@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "Footer contact email (1.8.6): extended demos@sontrarecords.com to the shared footer on all 3 pages — a .footer__contact line ('Demos & enquiries: …' mailto) inside .footer__brand, below the blurb; footer grid unchanged. Address now in about.html + footer×3 (keep in sync). Verified footer render. (Open: buy/donate URLs — waiting on team; real artwork/audio; mobile listen-test.)",
-      "spec_version": "1.8.6"
+      "focus": "Security hardening (1.8.7): added .env/key/secret rules to this PUBLIC repo's .gitignore (was OS-cruft only); confirmed GitHub secret-scanning + push-protection already ON; sontra git author = noreply (no gmail leak in new commits). Audited public-site↔private-tbot boundary: isolated at credential level, linked only via shared forfuturegoods-lang GH account → user must do account-level hardening (2FA, fine-grained token, Binance key IP-lock). (Open: buy/donate URLs; mobile listen-test.)",
+      "spec_version": "1.8.7"
     },
     "claude-remote": {
       "last_sync": null,

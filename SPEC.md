@@ -4,9 +4,9 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.8.6
+- **Spec version:** 1.8.7
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
-- **Last updated:** 2026-06-10
+- **Last updated:** 2026-06-11
 
 ---
 
@@ -366,3 +366,14 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   ("Demos & enquiries: …" mailto) inside `.footer__brand`, below the blurb — no
   change to the footer grid. The address now lives in two places (about.html +
   the footer on all three pages); keep them in sync if it changes.
+- **2026-06-11 — Secret-protection .gitignore (public-repo hygiene).** This repo
+  is PUBLIC, but `.gitignore` only covered OS/editor cruft — a stray `.env` or
+  service-key file could have been committed. Added rules for `.env`/`.env.*`
+  (keeping `.env.example`), `*.key`, `*.pem`, `secrets/`, `service-key*`,
+  `*service_role*`, `*.secret`. Note: the Supabase **publishable** key staying in
+  `supabase-config.js` is intentional (RLS-protected, safe to ship); only real
+  secrets are ignored. Defense-in-depth alongside GitHub secret-scanning +
+  push-protection, both already enabled on the repo. Context: audited the
+  public-site ↔ private-tbot security boundary — isolated at the credential
+  level; the only link is the shared `forfuturegoods-lang` GitHub account, so
+  account hardening (2FA, fine-grained token) is the real priority.
