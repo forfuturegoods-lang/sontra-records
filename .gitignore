@@ -17,6 +17,6 @@ Thumbs.db
 *.key
 *.pem
 secrets/
-service-key*
+*service-key*
 *service_role*
 *.secret
