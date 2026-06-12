@@ -1,7 +1,7 @@
 {
   "$schema_version": 1,
   "comment": "Sync-bus heartbeat. Each node updates its entry on every push. See .sync/BUS.md.",
-  "spec_version": "1.8.7",
+  "spec_version": "1.8.8",
   "github": {
     "connected": true,
     "url": "https://github.com/forfuturegoods-lang/sontra-records.git",
@@ -11,8 +11,8 @@
   "nodes": {
     "claude-local": {
       "last_sync": "2026-06-10",
-      "focus": "Security hardening (1.8.7): added .env/key/secret rules to this PUBLIC repo's .gitignore (was OS-cruft only); confirmed GitHub secret-scanning + push-protection already ON; sontra git author = noreply (no gmail leak in new commits). Audited public-site↔private-tbot boundary: isolated at credential level, linked only via shared forfuturegoods-lang GH account → user must do account-level hardening (2FA, fine-grained token, Binance key IP-lock). (Open: buy/donate URLs; mobile listen-test.)",
-      "spec_version": "1.8.7"
+      "focus": "Contact email fix (1.8.8): demos@sontrarecords.com (domain UNREGISTERED → bounced) → sontrarecords@gmail.com across all 5 mailto links; demos now arrive. User regained inbox access, so Supabase login recovery also works now (no migration). GitHub email change dropped (separation already met via noreply author). (Open: buy/donate URLs; register sontrarecords.com later; mobile listen-test; 2FA done, fine-grained token still pending.)",
+      "spec_version": "1.8.8"
     },
     "claude-remote": {
       "last_sync": null,

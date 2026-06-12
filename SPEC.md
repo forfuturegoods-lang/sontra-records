@@ -4,9 +4,9 @@
 > edited *before* code. Every change to the site must be specified here first,
 > and committed together with its implementation.
 
-- **Spec version:** 1.8.7
+- **Spec version:** 1.8.8
 - **Status:** Live (first release STR001 published via Supabase; team workflow documented — see §11)
-- **Last updated:** 2026-06-11
+- **Last updated:** 2026-06-12
 
 ---
 
@@ -377,3 +377,11 @@ Card grid 3 (desktop) → 2 (≤960px) → 1 (≤680px). Navbar collapses to ham
   public-site ↔ private-tbot security boundary — isolated at the credential
   level; the only link is the shared `forfuturegoods-lang` GitHub account, so
   account hardening (2FA, fine-grained token) is the real priority.
+- **2026-06-12 — Contact email fixed: `demos@sontrarecords.com` →
+  `sontrarecords@gmail.com` (all pages + About).** The advertised contact pointed
+  at the `sontrarecords.com` domain, which is **not registered** — so every demo
+  bounced (verified via whois: no registration, no MX). Repointed all 5 mailto
+  links (index/releases/about footers + About's two contacts) to the label's
+  real, now-accessible Gmail inbox so enquiries actually arrive. If the domain is
+  registered later, switch back to a `@sontrarecords.com` address (and forward it
+  to this inbox).
